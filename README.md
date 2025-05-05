@@ -35,10 +35,10 @@ The app uses a simple authentication mechanism via the `AuthCubit` class, which 
 - Sqflite
 
 ## Screens
-![Screenshot_1746472072](https://github.com/user-attachments/assets/2ce5f95f-1327-4322-a28f-84f55665f1cb)
-![Screenshot_1746472055](https://github.com/user-attachments/assets/6d377242-6fc9-4f1a-a020-f524277a5143)
-![Screenshot_1746471667](https://github.com/user-attachments/assets/f07b471c-3491-42f5-abd9-55fab0747e1a)
-![Screenshot_1746472146](https://github.com/user-attachments/assets/9ba39f08-260e-4f1a-9ecf-f45af638e303)
-![Screenshot_1746472143](https://github.com/user-attachments/assets/8763960b-d9a1-46ea-b106-70e63cadf860)
-![Screenshot_1746472140](https://github.com/user-attachments/assets/28f1d1f4-ef09-4a8f-9424-1fc8247f9578)
-![Screenshot_1746472082](https://github.com/user-attachments/assets/f772ad7c-5d65-4372-81d3-4f0ac08dfcf8)
+![1](https://github.com/user-attachments/assets/bcf721fb-8685-441f-9bcb-a942f4c69e00)
+![2](https://github.com/user-attachments/assets/b8554623-f987-4973-962b-e69ebcf78ad0)
+![3](https://github.com/user-attachments/assets/a384b7e2-95e0-4d91-b070-f48df1b28f3a)
+![4](https://github.com/user-attachments/assets/c0ac21b0-14f4-4d82-ae00-88e5c315a4d2)
+![5](https://github.com/user-attachments/assets/8d9afada-48f5-42e8-9143-63a31ea6045b)
+![6](https://github.com/user-attachments/assets/8b958fd1-2c5e-4bd6-a5cc-5ff153559c73)
+![7](https://github.com/user-attachments/assets/7a13d051-ce1e-4b0f-8ff9-89f0344dcbae)
