@@ -32,3 +32,4 @@ The app uses a simple authentication mechanism via the `AuthCubit` class, which 
 - Flutter
 - HTTP
 - Flutter Bloc
+- Sqflite
