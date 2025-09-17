@@ -6,6 +6,7 @@ class MyColors {
   //? Primary colors
   static const primaryRed = 0xffEF3651;
   static const primaryRedLight = 0xffFF6B81;
+  static const primaryRedDark = 0xffD32F2F;
 
   //? Text colors
   static const textColor = 0xffF6F6F6; // Primary text color (white)

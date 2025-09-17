@@ -10,7 +10,15 @@ abstract class ProductState extends Equatable {
 
 class ProductInitial extends ProductState {}
 
-class ProductLoading extends ProductState {}
+class ProductLoading extends ProductState {
+  final List<String>? categories;
+  final String? selectedCategory;
+  
+  const ProductLoading({this.categories, this.selectedCategory});
+  
+  @override
+  List<Object> get props => [categories ?? [], selectedCategory ?? ''];
+}
 
 class ProductLoaded extends ProductState {
   final List<ProductModel> products;
@@ -32,10 +40,20 @@ class ProductError extends ProductState {
 
 class CategoryLoaded extends ProductState {
   final List<String> categories;
-  CategoryLoaded(this.categories);
+  final String? selectedCategory;
+  const CategoryLoaded(this.categories, {this.selectedCategory});
+  
+  @override
+  List<Object> get props => [categories, selectedCategory ?? ''];
 }
 
 class ProductsLoaded extends ProductState {
   final List<dynamic> products;
-  ProductsLoaded(this.products);
+  final List<String>? categories;
+  final String? selectedCategory;
+  
+  const ProductsLoaded(this.products, {this.categories, this.selectedCategory});
+  
+  @override
+  List<Object> get props => [products, categories ?? [], selectedCategory ?? ''];
 }

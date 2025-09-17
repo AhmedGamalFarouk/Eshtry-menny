@@ -27,7 +27,7 @@ class BottomNavBar extends StatelessWidget {
           onTap: (index) {
             if (index == 0) {
               context.read<NavigationCubit>().showHome();
-              if (!(state is HomeState)) {
+              if (state is! HomeState) {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const HomePage()),
@@ -35,7 +35,7 @@ class BottomNavBar extends StatelessWidget {
               }
             } else if (index == 1) {
               context.read<NavigationCubit>().showFavorites();
-              if (!(state is FavoritesState)) {
+              if (state is! FavoritesState) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -44,7 +44,7 @@ class BottomNavBar extends StatelessWidget {
               }
             } else if (index == 2) {
               context.read<NavigationCubit>().showCart();
-              if (!(state is CartState)) {
+              if (state is! CartState) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const CartScreen()),
