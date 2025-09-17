@@ -59,10 +59,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       backgroundColor: const Color(MyColors.background),
       appBar: CustomAppBar(
         title: 'Product Details',
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: true,
       ),
       body: AnimatedBuilder(
         animation: _animationController,
@@ -390,129 +387,75 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   }
 
   Widget _buildActionButtons() {
-    return Row(
-      children: [
-        // Add to Cart Button
-        Expanded(
-          flex: 3,
-          child: Container(
-            height: 6.h,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: context.watch<CartCubit>().isInCart(widget.product)
-                  ? LinearGradient(
-                      colors: [
-                        const Color(MyColors.success),
-                        const Color(MyColors.success).withOpacity(0.8),
-                      ],
-                    )
-                  : LinearGradient(
-                      colors: [
-                        const Color(MyColors.primaryRed),
-                        const Color(MyColors.primaryRedLight),
-                      ],
-                    ),
-              boxShadow: [
-                BoxShadow(
-                  color: (context.watch<CartCubit>().isInCart(widget.product)
-                          ? const Color(MyColors.success)
-                          : const Color(MyColors.primaryRed))
-                      .withOpacity(0.3),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
+    return Container(
+      width: double.infinity,
+      height: 6.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: context.watch<CartCubit>().isInCart(widget.product)
+            ? LinearGradient(
+                colors: [
+                  const Color(MyColors.success),
+                  const Color(MyColors.success).withOpacity(0.8),
+                ],
+              )
+            : LinearGradient(
+                colors: [
+                  const Color(MyColors.primaryRed),
+                  const Color(MyColors.primaryRedLight),
+                ],
+              ),
+        boxShadow: [
+          BoxShadow(
+            color: (context.watch<CartCubit>().isInCart(widget.product)
+                    ? const Color(MyColors.success)
+                    : const Color(MyColors.primaryRed))
+                .withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            HapticFeedback.mediumImpact();
+            context.read<CartCubit>().addToCart(
+                  id: widget.product['id'],
+                  title: widget.product['title'],
+                  price: widget.product['price'].toDouble(),
+                  image: widget.product['image'],
+                );
+          },
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  context.watch<CartCubit>().isInCart(widget.product)
+                      ? Icons.check_rounded
+                      : Icons.add_shopping_cart_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                SizedBox(width: 2.w),
+                Text(
+                  context.watch<CartCubit>().isInCart(widget.product)
+                      ? 'Added to Cart'
+                      : 'Add to Cart',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () {
-                  HapticFeedback.mediumImpact();
-                  context.read<CartCubit>().addToCart(
-                        id: widget.product['id'],
-                        title: widget.product['title'],
-                        price: widget.product['price'].toDouble(),
-                        image: widget.product['image'],
-                      );
-                },
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        context.watch<CartCubit>().isInCart(widget.product)
-                            ? Icons.check_rounded
-                            : Icons.add_shopping_cart_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      SizedBox(width: 2.w),
-                      Text(
-                        context.watch<CartCubit>().isInCart(widget.product)
-                            ? 'Added to Cart'
-                            : 'Add to Cart',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           ),
         ),
-        SizedBox(width: 3.w),
-
-        // Buy Now Button
-        Expanded(
-          flex: 2,
-          child: Container(
-            height: 6.h,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(MyColors.primaryRed),
-                width: 2,
-              ),
-              color: Colors.transparent,
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () {
-                  HapticFeedback.mediumImpact();
-                  // Add buy now functionality here
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Buy Now feature coming soon!'),
-                      backgroundColor: const Color(MyColors.primaryRed),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  );
-                },
-                child: Center(
-                  child: Text(
-                    'Buy Now',
-                    style: TextStyle(
-                      color: const Color(MyColors.primaryRed),
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
