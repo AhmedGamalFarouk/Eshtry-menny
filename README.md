@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Eshtry-menny 🛒
 
 Eshtry-menny is a modern Flutter e-commerce application that provides a seamless shopping experience with a clean, intuitive interface. The app features comprehensive product browsing, cart management, favorites, and user authentication.
