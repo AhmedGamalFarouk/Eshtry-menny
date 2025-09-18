@@ -3,13 +3,13 @@
 Eshtry-menny is a modern Flutter e-commerce application that provides a seamless shopping experience with a clean, intuitive interface. The app features comprehensive product browsing, cart management, favorites, and user authentication.
 
 ## 📱 Screens
-<img width="426" height="952" alt="Screenshot_1758153223" src="https://github.com/user-attachments/assets/79b0b216-fdd9-473b-b608-38b64b40bbfd" />
-<img width="426" height="952" alt="Screenshot_1758153213" src="https://github.com/user-attachments/assets/07b46c32-7b06-4ff6-995f-0388097ea2c8" />
-<img width="426" height="952" alt="Screenshot_1758153205" src="https://github.com/user-attachments/assets/d151289d-528a-49bd-9297-ce9e949599ba" />
-<img width="426" height="952" alt="Screenshot_1758153201" src="https://github.com/user-attachments/assets/8bf59e10-1045-499c-827f-44681b64f100" />
-<img width="426" height="952" alt="Screenshot_1758153197" src="https://github.com/user-attachments/assets/0dea57a4-7c57-453c-ace2-1a58e043d4e7" />
-<img width="426" height="952" alt="Screenshot_1758153186" src="https://github.com/user-attachments/assets/80d52ca8-d09a-4535-a889-949ce77e410c" />
-<img width="426" height="952" alt="Screenshot_1758152863" src="https://github.com/user-attachments/assets/d062b3c3-da39-4fe2-9075-1a295c4fe7df" />
+<img width="213" height="476" alt="Screenshot_1758153223" src="https://github.com/user-attachments/assets/79b0b216-fdd9-473b-b608-38b64b40bbfd" />
+<img width="213" height="476" alt="Screenshot_1758153213" src="https://github.com/user-attachments/assets/07b46c32-7b06-4ff6-995f-0388097ea2c8" />
+<img width="213" height="476" alt="Screenshot_1758153205" src="https://github.com/user-attachments/assets/d151289d-528a-49bd-9297-ce9e949599ba" />
+<img width="213" height="476" alt="Screenshot_1758153201" src="https://github.com/user-attachments/assets/8bf59e10-1045-499c-827f-44681b64f100" />
+<img width="213" height="476" alt="Screenshot_1758153197" src="https://github.com/user-attachments/assets/0dea57a4-7c57-453c-ace2-1a58e043d4e7" />
+<img width="213" height="476" alt="Screenshot_1758153186" src="https://github.com/user-attachments/assets/80d52ca8-d09a-4535-a889-949ce77e410c" />
+<img width="213" height="476" alt="Screenshot_1758152863" src="https://github.com/user-attachments/assets/d062b3c3-da39-4fe2-9075-1a295c4fe7df" />
 
 
 ## ✨ Features
