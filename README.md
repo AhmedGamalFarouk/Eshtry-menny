@@ -2,6 +2,16 @@
 
 Eshtry-menny is a modern Flutter e-commerce application that provides a seamless shopping experience with a clean, intuitive interface. The app features comprehensive product browsing, cart management, favorites, and user authentication.
 
+## 📱 Screens
+<img width="426" height="952" alt="Screenshot_1758153223" src="https://github.com/user-attachments/assets/79b0b216-fdd9-473b-b608-38b64b40bbfd" />
+<img width="426" height="952" alt="Screenshot_1758153213" src="https://github.com/user-attachments/assets/07b46c32-7b06-4ff6-995f-0388097ea2c8" />
+<img width="426" height="952" alt="Screenshot_1758153205" src="https://github.com/user-attachments/assets/d151289d-528a-49bd-9297-ce9e949599ba" />
+<img width="426" height="952" alt="Screenshot_1758153201" src="https://github.com/user-attachments/assets/8bf59e10-1045-499c-827f-44681b64f100" />
+<img width="426" height="952" alt="Screenshot_1758153197" src="https://github.com/user-attachments/assets/0dea57a4-7c57-453c-ace2-1a58e043d4e7" />
+<img width="426" height="952" alt="Screenshot_1758153186" src="https://github.com/user-attachments/assets/80d52ca8-d09a-4535-a889-949ce77e410c" />
+<img width="426" height="952" alt="Screenshot_1758152863" src="https://github.com/user-attachments/assets/d062b3c3-da39-4fe2-9075-1a295c4fe7df" />
+
+
 ## ✨ Features
 
 ### 🔐 Authentication
@@ -118,87 +128,5 @@ The app supports:
 - Consistent Material Design components
 - Responsive typography
 
-## 📱 Platform Support
-
-- ✅ Android
-- ✅ iOS
-- ✅ Web
-- ✅ Windows
-- ✅ macOS
-- ✅ Linux
-
-## 🧪 Testing
-
-Run tests using:
-```bash
-flutter test
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📞 Support
-
-If you have any questions or issues, please open an issue on GitHub.
-
----
 
 **Built with ❤️ using Flutter**
-=======
-# Eshtry-menny
-
-Eshtry-menny is an e-commerce application designed to provide a seamless shopping experience.
-
-## Features
-
-- User authentication with sign-in and sign-up functionality.
-- Secure login using username and password.
-- Integration with FakeStore API for product data.
-
-## Installation
-
-To install the app, ensure you have Flutter installed on your system. Clone the repository and run:
-
-```
-flutter pub get
-flutter run
-```
-
-## Usage
-
-- Launch the app and sign in using your credentials. Username: mor_2314 Password: 83r5^_
-- Browse products and add them to your cart.
-- Proceed to checkout.
-
-## Authentication
-
-The app uses a simple authentication mechanism via the `AuthCubit` class, which handles login and registration.
-
-## Technologies Used
-
-- Flutter
-- HTTP
-- Flutter Bloc
-- Sqflite
-
-## Screens
-
-## Screens
-
-<img src="https://github.com/user-attachments/assets/bcf721fb-8685-441f-9bcb-a942f4c69e00" width="250"/>
-<img src="https://github.com/user-attachments/assets/b8554623-f987-4973-962b-e69ebcf78ad0" width="250"/>
-<img src="https://github.com/user-attachments/assets/a384b7e2-95e0-4d91-b070-f48df1b28f3a" width="250"/>
-<img src="https://github.com/user-attachments/assets/c0ac21b0-14f4-4d82-ae00-88e5c315a4d2" width="250"/>
-<img src="https://github.com/user-attachments/assets/8d9afada-48f5-42e8-9143-63a31ea6045b" width="250"/>
-<img src="https://github.com/user-attachments/assets/8b958fd1-2c5e-4bd6-a5cc-5ff153559c73" width="250"/>
-<img src="https://github.com/user-attachments/assets/7a13d051-ce1e-4b0f-8ff9-89f0344dcbae" width="250"/>
->>>>>>> 41090c47e0b2fbbf164c1367f622309cc24f8a84
