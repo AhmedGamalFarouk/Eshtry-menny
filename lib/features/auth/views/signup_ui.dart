@@ -147,13 +147,13 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
             shape: BoxShape.circle,
             gradient: LinearGradient(
               colors: [
-                const Color(MyColors.primaryRed).withOpacity(0.15),
-                const Color(MyColors.primaryRedLight).withOpacity(0.1),
+                const Color(MyColors.primaryRed).withValues(alpha: 0.15),
+                const Color(MyColors.primaryRedLight).withValues(alpha: 0.1),
               ],
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(MyColors.primaryRed).withOpacity(0.2),
+                color: const Color(MyColors.primaryRed).withValues(alpha: 0.2),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -197,7 +197,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
             spreadRadius: 0,
@@ -225,14 +225,14 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(MyColors.primaryRed).withOpacity(0.1),
-                  const Color(MyColors.primaryRedLight).withOpacity(0.05),
+                  const Color(MyColors.primaryRed).withValues(alpha: 0.1),
+                  const Color(MyColors.primaryRedLight).withValues(alpha: 0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(MyColors.primaryRed).withOpacity(0.1),
+                  color: const Color(MyColors.primaryRed).withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -257,7 +257,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: BorderSide(
-              color: const Color(MyColors.primaryRed).withOpacity(0.3),
+              color: const Color(MyColors.primaryRed).withValues(alpha: 0.3),
               width: 2,
             ),
           ),
@@ -283,7 +283,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
             spreadRadius: 0,
@@ -311,14 +311,14 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(MyColors.primaryRed).withOpacity(0.1),
-                  const Color(MyColors.primaryRedLight).withOpacity(0.05),
+                  const Color(MyColors.primaryRed).withValues(alpha: 0.1),
+                  const Color(MyColors.primaryRedLight).withValues(alpha: 0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(MyColors.primaryRed).withOpacity(0.1),
+                  color: const Color(MyColors.primaryRed).withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -343,7 +343,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: BorderSide(
-              color: const Color(MyColors.primaryRed).withOpacity(0.3),
+              color: const Color(MyColors.primaryRed).withValues(alpha: 0.3),
               width: 2,
             ),
           ),
@@ -372,7 +372,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
             spreadRadius: 0,
@@ -401,14 +401,14 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(MyColors.primaryRed).withOpacity(0.1),
-                  const Color(MyColors.primaryRedLight).withOpacity(0.05),
+                  const Color(MyColors.primaryRed).withValues(alpha: 0.1),
+                  const Color(MyColors.primaryRedLight).withValues(alpha: 0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(MyColors.primaryRed).withOpacity(0.1),
+                  color: const Color(MyColors.primaryRed).withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -447,7 +447,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: BorderSide(
-              color: const Color(MyColors.primaryRed).withOpacity(0.3),
+              color: const Color(MyColors.primaryRed).withValues(alpha: 0.3),
               width: 2,
             ),
           ),
@@ -485,7 +485,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(MyColors.primaryRed).withOpacity(0.4),
+            color: const Color(MyColors.primaryRed).withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),

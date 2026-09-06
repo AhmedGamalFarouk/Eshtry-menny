@@ -114,12 +114,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           end: Alignment.bottomCenter,
           colors: [
             Colors.white,
-            Colors.white.withOpacity(0.95),
+            Colors.white.withValues(alpha: 0.95),
           ],
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 20,
             offset: const Offset(0, 8),
             spreadRadius: 0,
@@ -166,10 +166,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 color:
                     context.watch<FavoritesCubit>().isFavorite(widget.product)
                         ? const Color(MyColors.primaryRed)
-                        : Colors.white.withOpacity(0.9),
+                        : Colors.white.withValues(alpha: 0.9),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -208,7 +208,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         color: const Color(MyColors.textfieldBakground),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -234,9 +234,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: const Color(MyColors.primaryRed).withOpacity(0.1),
+              color: const Color(MyColors.primaryRed).withValues(alpha: 0.1),
               border: Border.all(
-                color: const Color(MyColors.primaryRed).withOpacity(0.3),
+                color: const Color(MyColors.primaryRed).withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -286,7 +286,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         color: const Color(MyColors.textfieldBakground),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -327,7 +327,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         color: const Color(MyColors.textfieldBakground),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -388,7 +388,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             ? LinearGradient(
                 colors: [
                   const Color(MyColors.success),
-                  const Color(MyColors.success).withOpacity(0.8),
+                  const Color(MyColors.success).withValues(alpha: 0.8),
                 ],
               )
             : LinearGradient(
@@ -402,7 +402,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             color: (context.watch<CartCubit>().isInCart(widget.product)
                     ? const Color(MyColors.success)
                     : const Color(MyColors.primaryRed))
-                .withOpacity(0.3),
+                .withValues(alpha: 0.3),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),

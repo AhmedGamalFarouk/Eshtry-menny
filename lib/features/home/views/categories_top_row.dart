@@ -67,19 +67,19 @@ class _CategoriesTopRowState extends State<CategoriesTopRow>
                     : const Color(MyColors.textfieldBakground),
                 boxShadow: widget.isSelected ? [
                   BoxShadow(
-                    color: const Color(MyColors.primaryRed).withOpacity(0.3),
+                    color: const Color(MyColors.primaryRed).withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
                 ] : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
                 ],
                 border: widget.isSelected ? null : Border.all(
-                  color: const Color(MyColors.secondaryGrey).withOpacity(0.2),
+                  color: const Color(MyColors.secondaryGrey).withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),

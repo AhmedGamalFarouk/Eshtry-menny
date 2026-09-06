@@ -70,8 +70,8 @@ class _EmptyCartState extends State<EmptyCart>
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        const Color(MyColors.primaryRed).withOpacity(0.1),
-                        const Color(MyColors.primaryRed).withOpacity(0.05),
+                        const Color(MyColors.primaryRed).withValues(alpha: 0.1),
+                        const Color(MyColors.primaryRed).withValues(alpha: 0.05),
                       ],
                     ),
                   ),
@@ -124,7 +124,7 @@ class _EmptyCartState extends State<EmptyCart>
                     boxShadow: [
                       BoxShadow(
                         color:
-                            const Color(MyColors.primaryRed).withOpacity(0.3),
+                            const Color(MyColors.primaryRed).withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),

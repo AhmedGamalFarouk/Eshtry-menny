@@ -131,13 +131,13 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(MyColors.primaryRed).withOpacity(0.1),
-            const Color(MyColors.primaryRedLight).withOpacity(0.05),
+            const Color(MyColors.primaryRed).withValues(alpha: 0.1),
+            const Color(MyColors.primaryRedLight).withValues(alpha: 0.05),
           ],
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(MyColors.primaryRed).withOpacity(0.2),
+            color: const Color(MyColors.primaryRed).withValues(alpha: 0.2),
             blurRadius: 30,
             offset: const Offset(0, 10),
             spreadRadius: 0,
@@ -158,7 +158,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(MyColors.primaryRed).withOpacity(0.4),
+              color: const Color(MyColors.primaryRed).withValues(alpha: 0.4),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -211,13 +211,13 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
           end: Alignment.bottomRight,
           colors: [
             const Color(MyColors.textfieldBakground),
-            const Color(MyColors.textfieldBakground).withOpacity(0.8),
+            const Color(MyColors.textfieldBakground).withValues(alpha: 0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 8),
             spreadRadius: 0,
@@ -233,8 +233,8 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      const Color(MyColors.primaryRed).withOpacity(0.1),
-                      const Color(MyColors.primaryRedLight).withOpacity(0.05),
+                      const Color(MyColors.primaryRed).withValues(alpha: 0.1),
+                      const Color(MyColors.primaryRedLight).withValues(alpha: 0.05),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(10),
@@ -308,7 +308,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(MyColors.primaryRed).withOpacity(0.4),
+            color: const Color(MyColors.primaryRed).withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -362,12 +362,12 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(MyColors.primaryRed).withOpacity(0.3),
+          color: const Color(MyColors.primaryRed).withValues(alpha: 0.3),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

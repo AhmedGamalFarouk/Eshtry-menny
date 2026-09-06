@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../core/constants/mycolors.dart';
-import '../../../core/widgets/bottom_nav_bar.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../cubit/cart_cubit.dart';
 import 'checkout_screen.dart';
@@ -65,7 +64,6 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(MyColors.background),
-      bottomNavigationBar: const BottomNavBar(),
       appBar: CustomAppBar(
         title: 'My Cart',
       ),
@@ -170,12 +168,12 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
               end: Alignment.bottomRight,
               colors: [
                 const Color(MyColors.textfieldBakground),
-                const Color(MyColors.textfieldBakground).withOpacity(0.8),
+                const Color(MyColors.textfieldBakground).withValues(alpha: 0.8),
               ],
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 15,
                 offset: const Offset(0, 8),
                 spreadRadius: 0,
@@ -193,7 +191,7 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -316,7 +314,7 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(30),
         color: const Color(MyColors.background),
         border: Border.all(
-          color: const Color(MyColors.primaryRed).withOpacity(0.2),
+          color: const Color(MyColors.primaryRed).withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -366,12 +364,12 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
       decoration: BoxDecoration(
         color: isEnabled
             ? const Color(MyColors.primaryRed)
-            : const Color(MyColors.textSecondary).withOpacity(0.3),
+            : const Color(MyColors.textSecondary).withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(18),
         boxShadow: isEnabled
             ? [
                 BoxShadow(
-                  color: const Color(MyColors.primaryRed).withOpacity(0.3),
+                  color: const Color(MyColors.primaryRed).withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -416,12 +414,12 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
           end: Alignment.bottomCenter,
           colors: [
             const Color(MyColors.textfieldBakground),
-            const Color(MyColors.textfieldBakground).withOpacity(0.95),
+            const Color(MyColors.textfieldBakground).withValues(alpha: 0.95),
           ],
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 25,
             offset: const Offset(0, -10),
             spreadRadius: 0,
@@ -449,7 +447,7 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                       EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.5.h),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: const Color(MyColors.primaryRed).withOpacity(0.1),
+                    color: const Color(MyColors.primaryRed).withValues(alpha: 0.1),
                   ),
                   child: Text(
                     '$totalItems items',
@@ -507,7 +505,7 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
             ),
             SizedBox(height: 1.h),
             Divider(
-              color: const Color(MyColors.textSecondary).withOpacity(0.3),
+              color: const Color(MyColors.textSecondary).withValues(alpha: 0.3),
               thickness: 1,
             ),
             SizedBox(height: 1.h),
@@ -551,7 +549,7 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(MyColors.primaryRed).withOpacity(0.4),
+                      color: const Color(MyColors.primaryRed).withValues(alpha: 0.4),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),

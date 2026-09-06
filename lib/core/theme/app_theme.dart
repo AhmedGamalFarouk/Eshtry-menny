@@ -12,13 +12,12 @@ class AppTheme {
       useMaterial3: true,
 
       // AppBar theme with modern styling
-      appBarTheme: AppBarTheme(
-        backgroundColor: const Color(MyColors.primaryRed),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(MyColors.primaryRed),
         elevation: 0,
         centerTitle: false,
-        iconTheme: const IconThemeData(color: Color(MyColors.textColor)),
-        titleTextStyle: const TextStyle(
-          fontFamily: 'Metropolis',
+        iconTheme: IconThemeData(color: Color(MyColors.textColor)),
+        titleTextStyle: TextStyle(
           color: Color(MyColors.textColor),
           fontSize: 24,
           fontWeight: FontWeight.bold,
@@ -58,17 +57,14 @@ class AppTheme {
         ),
         hintStyle: const TextStyle(
           color: Color(MyColors.secondaryGrey),
-          fontFamily: 'Metropolis',
           fontSize: 16,
         ),
         labelStyle: const TextStyle(
           color: Color(MyColors.secondaryGrey),
-          fontFamily: 'Metropolis',
           fontSize: 16,
         ),
         floatingLabelStyle: const TextStyle(
           color: Color(MyColors.primaryRed),
-          fontFamily: 'Metropolis',
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
@@ -85,7 +81,6 @@ class AppTheme {
             borderRadius: BorderRadius.circular(16),
           ),
           textStyle: const TextStyle(
-            fontFamily: 'Metropolis',
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
@@ -95,10 +90,10 @@ class AppTheme {
           overlayColor: WidgetStateProperty.resolveWith<Color?>(
             (Set<WidgetState> states) {
               if (states.contains(WidgetState.pressed)) {
-                return Colors.white.withOpacity(0.1);
+                return Colors.white.withValues(alpha: 0.1);
               }
               if (states.contains(WidgetState.hovered)) {
-                return Colors.white.withOpacity(0.05);
+                return Colors.white.withValues(alpha: 0.05);
               }
               return null;
             },
@@ -116,7 +111,6 @@ class AppTheme {
             borderRadius: BorderRadius.circular(16),
           ),
           textStyle: const TextStyle(
-            fontFamily: 'Metropolis',
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
@@ -127,49 +121,41 @@ class AppTheme {
       // Text theme
       textTheme: const TextTheme(
         headlineLarge: TextStyle(
-          fontFamily: 'Metropolis',
           color: Color(MyColors.textColor),
           fontSize: 34,
           fontWeight: FontWeight.bold,
         ),
         titleLarge: TextStyle(
-          fontFamily: 'Metropolis',
           color: Color(MyColors.textColor),
           fontSize: 24,
           fontWeight: FontWeight.bold,
         ),
         titleMedium: TextStyle(
-          fontFamily: 'Metropolis',
           color: Color(MyColors.textColor),
           fontSize: 18,
           fontWeight: FontWeight.w600,
         ),
         bodyLarge: TextStyle(
-          fontFamily: 'Metropolis',
           color: Color(MyColors.textColor),
           fontSize: 16,
           fontWeight: FontWeight.normal,
         ),
         bodyMedium: TextStyle(
-          fontFamily: 'Metropolis',
           color: Color(MyColors.textColor),
           fontSize: 14,
           fontWeight: FontWeight.normal,
         ),
         labelLarge: TextStyle(
-          fontFamily: 'Metropolis',
           color: Color(MyColors.textColor),
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
         labelMedium: TextStyle(
-          fontFamily: 'Metropolis',
           color: Color(MyColors.textColor),
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
         labelSmall: TextStyle(
-          fontFamily: 'Metropolis',
           color: Color(MyColors.textColor),
           fontSize: 11,
           fontWeight: FontWeight.normal,
@@ -195,12 +181,10 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 16,
         selectedLabelStyle: TextStyle(
-          fontFamily: 'Metropolis',
           fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
         unselectedLabelStyle: TextStyle(
-          fontFamily: 'Metropolis',
           fontSize: 12,
           fontWeight: FontWeight.w400,
         ),
@@ -226,7 +210,6 @@ class AppTheme {
         disabledColor: const Color(MyColors.secondaryGrey),
         labelStyle: const TextStyle(
           color: Color(MyColors.textColor),
-          fontFamily: 'Metropolis',
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),

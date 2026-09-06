@@ -94,13 +94,13 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                             colors: [
                               Color(MyColors.textfieldBakground),
                               Color(MyColors.textfieldBakground)
-                                  .withOpacity(0.8),
+                                  .withValues(alpha: 0.8),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 20,
                               offset: const Offset(0, 8),
                               spreadRadius: 0,
@@ -184,13 +184,13 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                             colors: [
                               Color(MyColors.textfieldBakground),
                               Color(MyColors.textfieldBakground)
-                                  .withOpacity(0.8),
+                                  .withValues(alpha: 0.8),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 20,
                               offset: const Offset(0, 8),
                               spreadRadius: 0,
@@ -248,75 +248,73 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                             colors: [
                               Color(MyColors.textfieldBakground),
                               Color(MyColors.textfieldBakground)
-                                  .withOpacity(0.8),
+                                  .withValues(alpha: 0.8),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 20,
                               offset: const Offset(0, 8),
                               spreadRadius: 0,
                             ),
                           ],
                         ),
-                        child: Column(
-                          children: [
-                            ListTile(
-                              leading: Radio(
-                                value: 'card',
-                                groupValue: selectedPaymentMethod,
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedPaymentMethod = value.toString();
-                                  });
-                                },
-                                activeColor: Color(MyColors.primaryRed),
-                                fillColor:
-                                    WidgetStateProperty.resolveWith<Color>(
-                                  (Set<WidgetState> states) {
-                                    if (states.contains(WidgetState.selected)) {
-                                      return Color(MyColors.primaryRed);
-                                    }
-                                    return Color(MyColors.textSecondary);
-                                  },
+                        child: RadioGroup<String>(
+                          groupValue: selectedPaymentMethod,
+                          onChanged: (String? value) {
+                            if (value != null) {
+                              setState(() {
+                                selectedPaymentMethod = value;
+                              });
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              ListTile(
+                                leading: Radio<String>(
+                                  value: 'card',
+                                  activeColor: const Color(MyColors.primaryRed),
+                                  fillColor:
+                                      WidgetStateProperty.resolveWith<Color>(
+                                    (Set<WidgetState> states) {
+                                      if (states.contains(WidgetState.selected)) {
+                                        return const Color(MyColors.primaryRed);
+                                      }
+                                      return const Color(MyColors.textSecondary);
+                                    },
+                                  ),
                                 ),
+                                title: const Text('Credit/Debit Card',
+                                    style: TextStyle(
+                                        color: Color(MyColors.textColor))),
+                                trailing: const Icon(Icons.credit_card,
+                                    color: Color(MyColors.textSecondary)),
                               ),
-                              title: Text('Credit/Debit Card',
-                                  style: TextStyle(
-                                      color: Color(MyColors.textColor))),
-                              trailing: Icon(Icons.credit_card,
-                                  color: Color(MyColors.textSecondary)),
-                            ),
-                            Divider(color: Color(MyColors.secondaryGrey)),
-                            ListTile(
-                              leading: Radio(
-                                value: 'paypal',
-                                groupValue: selectedPaymentMethod,
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedPaymentMethod = value.toString();
-                                  });
-                                },
-                                activeColor: Color(MyColors.primaryRed),
-                                fillColor:
-                                    WidgetStateProperty.resolveWith<Color>(
-                                  (Set<WidgetState> states) {
-                                    if (states.contains(WidgetState.selected)) {
-                                      return Color(MyColors.primaryRed);
-                                    }
-                                    return Color(MyColors.textSecondary);
-                                  },
+                              const Divider(color: Color(MyColors.secondaryGrey)),
+                              ListTile(
+                                leading: Radio<String>(
+                                  value: 'paypal',
+                                  activeColor: const Color(MyColors.primaryRed),
+                                  fillColor:
+                                      WidgetStateProperty.resolveWith<Color>(
+                                    (Set<WidgetState> states) {
+                                      if (states.contains(WidgetState.selected)) {
+                                        return const Color(MyColors.primaryRed);
+                                      }
+                                      return const Color(MyColors.textSecondary);
+                                    },
+                                  ),
                                 ),
+                                title: const Text('PayPal',
+                                    style: TextStyle(
+                                        color: Color(MyColors.textColor))),
+                                trailing: const Icon(Icons.payment,
+                                    color: Color(MyColors.textSecondary)),
                               ),
-                              title: Text('PayPal',
-                                  style: TextStyle(
-                                      color: Color(MyColors.textColor))),
-                              trailing: Icon(Icons.paypal,
-                                  color: Color(MyColors.textSecondary)),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       SizedBox(height: 4.h),
@@ -338,7 +336,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                           boxShadow: [
                             BoxShadow(
                               color:
-                                  Color(MyColors.primaryRed).withOpacity(0.4),
+                                  Color(MyColors.primaryRed).withValues(alpha: 0.4),
                               blurRadius: 20,
                               offset: const Offset(0, 8),
                             ),
@@ -412,14 +410,14 @@ class _CheckoutScreenState extends State<CheckoutScreen>
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [
-            Color(MyColors.primaryRed).withOpacity(0.1),
-            Color(MyColors.primaryRedLight).withOpacity(0.05),
+            Color(MyColors.primaryRed).withValues(alpha: 0.1),
+            Color(MyColors.primaryRedLight).withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Color(MyColors.primaryRed).withOpacity(0.1),
+            color: Color(MyColors.primaryRed).withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -441,7 +439,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Color(MyColors.primaryRed).withOpacity(0.3),
+                  color: Color(MyColors.primaryRed).withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -476,7 +474,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -501,8 +499,8 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(MyColors.primaryRed).withOpacity(0.1),
-                  Color(MyColors.primaryRedLight).withOpacity(0.05),
+                  Color(MyColors.primaryRed).withValues(alpha: 0.1),
+                  Color(MyColors.primaryRedLight).withValues(alpha: 0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(10),
@@ -522,7 +520,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
             borderSide: BorderSide(
-              color: Color(MyColors.secondaryGrey).withOpacity(0.3),
+              color: Color(MyColors.secondaryGrey).withValues(alpha: 0.3),
               width: 1,
             ),
           ),

@@ -5,8 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../core/constants/mycolors.dart';
-import '../../../core/widgets/bottom_nav_bar.dart';
+import '../../../core/navigation_cubit.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import '../../auth/cubit/auth_cubit.dart';
 import '../../cart/cubit/cart_cubit.dart';
 import '../../favorites/cubit/favorites_cubit.dart';
 import '../cubit/product_cubit.dart';
@@ -37,13 +38,60 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(MyColors.textfieldBakground),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Sign Out',
+          style: TextStyle(color: Color(MyColors.textColor)),
+        ),
+        content: const Text(
+          'Are you sure you want to sign out?',
+          style: TextStyle(color: Color(MyColors.textSecondary)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Color(MyColors.textSecondary)),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(MyColors.primaryRed),
+              minimumSize: const Size(80, 36),
+            ),
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              await context.read<AuthCubit>().signOut();
+              if (context.mounted) {
+                context.read<NavigationCubit>().showSignIn();
+              }
+            },
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(MyColors.background),
-      bottomNavigationBar: const BottomNavBar(),
-      appBar: const CustomAppBar(
+      appBar: CustomAppBar(
         title: 'Discover',
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Color(MyColors.textColor)),
+            tooltip: 'Sign Out',
+            onPressed: () => _showLogoutDialog(context),
+          ),
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 2.h),

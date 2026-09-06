@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../core/constants/mycolors.dart';
-import '../../../core/widgets/bottom_nav_bar.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../../cart/cubit/cart_cubit.dart';
 import '../cubit/favorites_cubit.dart';
@@ -58,7 +57,6 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(MyColors.background),
-      bottomNavigationBar: const BottomNavBar(),
       appBar: CustomAppBar(
         title: 'My Favorites',
       ),
@@ -139,18 +137,20 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                 end: Alignment.bottomRight,
                 colors: [
                   const Color(MyColors.textfieldBakground),
-                  const Color(MyColors.textfieldBakground).withOpacity(0.8),
+                  const Color(MyColors.textfieldBakground)
+                      .withValues(alpha: 0.8),
                 ],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withValues(alpha: 0.15),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                   spreadRadius: 0,
                 ),
                 BoxShadow(
-                  color: const Color(MyColors.primaryRed).withOpacity(0.05),
+                  color: const Color(MyColors.primaryRed)
+                      .withValues(alpha: 0.05),
                   blurRadius: 30,
                   offset: const Offset(0, 15),
                   spreadRadius: -5,
@@ -173,7 +173,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.white,
-                            Colors.white.withOpacity(0.95),
+                            Colors.white.withValues(alpha: 0.95),
                           ],
                         ),
                         borderRadius: const BorderRadius.vertical(
@@ -228,7 +228,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                                 color: const Color(MyColors.primaryRed),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
+                                    color: Colors.black.withValues(alpha: 0.1),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),
@@ -307,13 +307,13 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                                           colors: [
                                             const Color(MyColors.success),
                                             const Color(MyColors.success)
-                                                .withOpacity(0.8),
+                                                .withValues(alpha: 0.8),
                                           ],
                                         )
-                                      : LinearGradient(
+                                      : const LinearGradient(
                                           colors: [
-                                            const Color(MyColors.primaryRed),
-                                            const Color(
+                                            Color(MyColors.primaryRed),
+                                            Color(
                                                 MyColors.primaryRedLight),
                                           ],
                                         ),
@@ -325,7 +325,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                                               ? const Color(MyColors.success)
                                               : const Color(
                                                   MyColors.primaryRed))
-                                          .withOpacity(0.3),
+                                          .withValues(alpha: 0.3),
                                       blurRadius: 8,
                                       offset: const Offset(0, 4),
                                     ),

@@ -158,13 +158,13 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
             shape: BoxShape.circle,
             gradient: LinearGradient(
               colors: [
-                const Color(MyColors.primaryRed).withOpacity(0.15),
-                const Color(MyColors.primaryRedLight).withOpacity(0.1),
+                const Color(MyColors.primaryRed).withValues(alpha: 0.15),
+                const Color(MyColors.primaryRedLight).withValues(alpha: 0.1),
               ],
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(MyColors.primaryRed).withOpacity(0.2),
+                color: const Color(MyColors.primaryRed).withValues(alpha: 0.2),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -255,14 +255,14 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(MyColors.primaryRed).withOpacity(0.15),
-                    const Color(MyColors.primaryRedLight).withOpacity(0.1),
+                    const Color(MyColors.primaryRed).withValues(alpha: 0.15),
+                    const Color(MyColors.primaryRedLight).withValues(alpha: 0.1),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(MyColors.primaryRed).withOpacity(0.1),
+                    color: const Color(MyColors.primaryRed).withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -343,14 +343,14 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(MyColors.primaryRed).withOpacity(0.15),
-                    const Color(MyColors.primaryRedLight).withOpacity(0.1),
+                    const Color(MyColors.primaryRed).withValues(alpha: 0.15),
+                    const Color(MyColors.primaryRedLight).withValues(alpha: 0.1),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(MyColors.primaryRed).withOpacity(0.1),
+                    color: const Color(MyColors.primaryRed).withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -444,13 +444,13 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(MyColors.primaryRed).withOpacity(0.4),
+            color: const Color(MyColors.primaryRed).withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
             spreadRadius: 0,
           ),
           BoxShadow(
-            color: const Color(MyColors.primaryRed).withOpacity(0.2),
+            color: const Color(MyColors.primaryRed).withValues(alpha: 0.2),
             blurRadius: 30,
             offset: const Offset(0, 15),
             spreadRadius: -5,
@@ -531,16 +531,16 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
         gradient: LinearGradient(
           colors: [
             const Color(MyColors.textfieldBakground),
-            const Color(MyColors.textfieldBakground).withOpacity(0.8),
+            const Color(MyColors.textfieldBakground).withValues(alpha: 0.8),
           ],
         ),
         border: Border.all(
-          color: const Color(MyColors.primaryRed).withOpacity(0.3),
+          color: const Color(MyColors.primaryRed).withValues(alpha: 0.3),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
