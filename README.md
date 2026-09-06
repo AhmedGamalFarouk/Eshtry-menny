@@ -5,15 +5,19 @@ Eshtry-menny is a modern, high-end Flutter e-commerce application engineered wit
 ## 📱 Screens
 
 <p align="center">
-  <img width="213" alt="Screenshot 1" src="https://github.com/user-attachments/assets/79b0b216-fdd9-473b-b608-38b64b40bbfd" />
-  <img width="213" alt="Screenshot 2" src="https://github.com/user-attachments/assets/07b46c32-7b06-4ff6-995f-0388097ea2c8" />
-  <img width="213" alt="Screenshot 3" src="https://github.com/user-attachments/assets/d151289d-528a-49bd-9297-ce9e949599ba" />
-  <img width="213" alt="Screenshot 4" src="https://github.com/user-attachments/assets/8bf59e10-1045-499c-827f-44681b64f100" />
+  <img width="213" alt="Sign In" src="docs/screenshots/signin.png" />
+  <img width="213" alt="Discover Catalog" src="docs/screenshots/home.png" />
+  <img width="213" alt="Product Details" src="docs/screenshots/product_detail.png" />
 </p>
 <p align="center">
-  <img width="213" alt="Screenshot 5" src="https://github.com/user-attachments/assets/0dea57a4-7c57-453c-ace2-1a58e043d4e7" />
-  <img width="213" alt="Screenshot 6" src="https://github.com/user-attachments/assets/80d52ca8-d09a-4535-a889-949ce77e410c" />
-  <img width="213" alt="Screenshot 7" src="https://github.com/user-attachments/assets/d062b3c3-da39-4fe2-9075-1a295c4fe7df" />
+  <img width="213" alt="Wishlist" src="docs/screenshots/favorites.png" />
+  <img width="213" alt="Shopping Cart" src="docs/screenshots/cart.png" />
+  <img width="213" alt="Checkout" src="docs/screenshots/checkout.png" />
+</p>
+<p align="center">
+  <img width="213" alt="Order Confirmed" src="docs/screenshots/order_success.png" />
+  <img width="213" alt="User Profile" src="docs/screenshots/profile.png" />
+  <img width="213" alt="Sign Up" src="docs/screenshots/signup.png" />
 </p>
 
 ## ✨ Features
