@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/services/database_helper.dart';
+import '../data/repositories/cart_repository.dart';
 
 class CartItem {
   final int id;
@@ -34,13 +34,14 @@ class CartLoaded extends CartState {
 
 // Cart Cubit
 class CartCubit extends Cubit<CartState> {
-  CartCubit() : super(CartInitial()) {
-    // Load cart items from database when cubit is initialized
+  final CartRepository _cartRepository;
+  final List<CartItem> _items = [];
+
+  CartCubit({CartRepository? repository})
+      : _cartRepository = repository ?? CartRepositoryImpl(),
+        super(CartInitial()) {
     loadCart();
   }
-
-  final DatabaseHelper _databaseHelper = DatabaseHelper();
-  final List<CartItem> _items = [];
 
   bool isInCart(dynamic product) {
     return _items.any((item) => item.id == product['id']);
@@ -59,7 +60,7 @@ class CartCubit extends Cubit<CartState> {
 
     if (existingItem.id != -1) {
       existingItem.quantity++;
-      await _databaseHelper.updateCartItemQuantity(id, existingItem.quantity);
+      await _cartRepository.updateCartItemQuantity(id, existingItem.quantity);
     } else {
       final cartItem = CartItem(
         id: id,
@@ -68,7 +69,7 @@ class CartCubit extends Cubit<CartState> {
         image: image,
       );
       _items.add(cartItem);
-      await _databaseHelper.insertCartItem(cartItem);
+      await _cartRepository.addCartItem(cartItem);
     }
 
     emit(CartLoaded(_items));
@@ -77,7 +78,7 @@ class CartCubit extends Cubit<CartState> {
   Future<void> loadCart() async {
     try {
       _items.clear();
-      _items.addAll(await _databaseHelper.getCartItems());
+      _items.addAll(await _cartRepository.getCartItems());
       emit(CartLoaded(_items));
     } catch (e) {
       emit(CartInitial());
@@ -86,7 +87,7 @@ class CartCubit extends Cubit<CartState> {
 
   Future<void> removeFromCart(int id) async {
     _items.removeWhere((item) => item.id == id);
-    await _databaseHelper.deleteCartItem(id);
+    await _cartRepository.deleteCartItem(id);
     emit(CartLoaded(_items));
   }
 
@@ -98,13 +99,13 @@ class CartCubit extends Cubit<CartState> {
 
     final item = _items.firstWhere((item) => item.id == id);
     item.quantity = quantity;
-    await _databaseHelper.updateCartItemQuantity(id, quantity);
+    await _cartRepository.updateCartItemQuantity(id, quantity);
     emit(CartLoaded(_items));
   }
 
   Future<void> clearCart() async {
     _items.clear();
-    await _databaseHelper.clearCart();
+    await _cartRepository.clearCart();
     emit(CartLoaded(_items));
   }
 }

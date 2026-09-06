@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/services/database_helper.dart';
+import '../data/repositories/favorites_repository.dart';
 
 // States
 abstract class FavoritesState {}
@@ -18,17 +18,19 @@ class FavoritesError extends FavoritesState {
 
 // Cubit
 class FavoritesCubit extends Cubit<FavoritesState> {
-  FavoritesCubit() : super(FavoritesInitial()) {
+  final FavoritesRepository _favoritesRepository;
+  final List<dynamic> _favorites = [];
+
+  FavoritesCubit({FavoritesRepository? repository})
+      : _favoritesRepository = repository ?? FavoritesRepositoryImpl(),
+        super(FavoritesInitial()) {
     loadFavorites();
   }
-
-  final DatabaseHelper _databaseHelper = DatabaseHelper();
-  final List<dynamic> _favorites = [];
 
   Future<void> loadFavorites() async {
     try {
       _favorites.clear();
-      final persisted = await _databaseHelper.getFavorites();
+      final persisted = await _favoritesRepository.getFavorites();
       _favorites.addAll(persisted);
       emit(FavoritesLoaded(List.from(_favorites)));
     } catch (e) {
@@ -42,10 +44,10 @@ class FavoritesCubit extends Cubit<FavoritesState> {
 
     if (exists) {
       _favorites.removeWhere((item) => item['id'] == productId);
-      await _databaseHelper.deleteFavorite(productId);
+      await _favoritesRepository.deleteFavorite(productId);
     } else {
       _favorites.add(product);
-      await _databaseHelper.insertFavorite(
+      await _favoritesRepository.addFavorite(
         product is Map<String, dynamic>
             ? product
             : Map<String, dynamic>.from(product as Map),

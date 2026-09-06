@@ -1,11 +1,14 @@
-import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
 import '../data/models/product_model.dart';
+import '../data/repositories/product_repository.dart';
 import 'product_state.dart';
 
 class ProductCubit extends Cubit<ProductState> {
-  ProductCubit() : super(ProductInitial());
+  final ProductRepository _repository;
+
+  ProductCubit({ProductRepository? repository})
+      : _repository = repository ?? ProductRepositoryImpl(),
+        super(ProductInitial());
 
   List<ProductModel> _allProducts = [];
   List<String> _categories = ['All'];
@@ -16,7 +19,7 @@ class ProductCubit extends Cubit<ProductState> {
   String get selectedCategory => _selectedCategory;
   String get searchQuery => _searchQuery;
 
-  /// Loads both categories and all products concurrently with error handling.
+  /// Loads both categories and all products concurrently with clean error handling.
   Future<void> loadInitialData() async {
     try {
       emit(ProductLoading(
@@ -25,35 +28,19 @@ class ProductCubit extends Cubit<ProductState> {
       ));
 
       final results = await Future.wait([
-        http
-            .get(Uri.parse('https://fakestoreapi.com/products/categories'))
-            .timeout(const Duration(seconds: 15)),
-        http
-            .get(Uri.parse('https://fakestoreapi.com/products'))
-            .timeout(const Duration(seconds: 15)),
+        _repository.getCategories(),
+        _repository.getProducts(),
       ]);
 
-      final categoriesResponse = results[0];
-      final productsResponse = results[1];
+      final rawCategories = results[0] as List<String>;
+      final rawProducts = results[1] as List<ProductModel>;
 
-      if (categoriesResponse.statusCode == 200 &&
-          productsResponse.statusCode == 200) {
-        final List<dynamic> rawCategories =
-            json.decode(categoriesResponse.body);
-        _categories = ['All', ...rawCategories.map((c) => c.toString())];
+      _categories = ['All', ...rawCategories];
+      _allProducts = rawProducts;
 
-        final List<dynamic> rawProducts = json.decode(productsResponse.body);
-        _allProducts = rawProducts
-            .map((item) => ProductModel.fromJson(item as Map<String, dynamic>))
-            .toList();
-
-        _emitFilteredProducts();
-      } else {
-        emit(ProductError(
-            'Failed to load products: status ${productsResponse.statusCode}'));
-      }
+      _emitFilteredProducts();
     } catch (e) {
-      emit(ProductError('Connection error: $e'));
+      emit(ProductError(e.toString()));
     }
   }
 
