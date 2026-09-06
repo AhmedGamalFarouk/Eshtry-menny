@@ -12,7 +12,8 @@ class BottomNavBar extends StatelessWidget {
       builder: (context, state) {
         final currentIndex = (state is HomeState ||
                 state is FavoritesState ||
-                state is CartState)
+                state is CartState ||
+                state is ProfileNavState)
             ? state.tabIndex
             : 0;
 
@@ -21,6 +22,7 @@ class BottomNavBar extends StatelessWidget {
           currentIndex: currentIndex,
           selectedItemColor: const Color(MyColors.primaryRed),
           unselectedItemColor: Colors.grey,
+          type: BottomNavigationBarType.fixed,
           onTap: (index) {
             context.read<NavigationCubit>().changeTab(index);
           },
@@ -36,6 +38,10 @@ class BottomNavBar extends StatelessWidget {
             BottomNavigationBarItem(
               icon: Icon(Icons.shopping_cart),
               label: 'Cart',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
             ),
           ],
         );

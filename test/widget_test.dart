@@ -9,6 +9,7 @@ import 'package:sizer/sizer.dart';
 
 import 'package:e_commers_app/core/network/api_client.dart';
 import 'package:e_commers_app/core/network/api_exceptions.dart';
+import 'package:e_commers_app/core/network/network_monitor_cubit.dart';
 import 'package:e_commers_app/core/navigation_cubit.dart' as nav;
 import 'package:e_commers_app/core/views/main_screen.dart';
 import 'package:e_commers_app/features/home/data/models/product_model.dart';
@@ -19,6 +20,11 @@ import 'package:e_commers_app/features/cart/cubit/cart_cubit.dart';
 import 'package:e_commers_app/features/auth/cubit/auth_cubit.dart';
 import 'package:e_commers_app/features/auth/data/repositories/auth_repository.dart';
 import 'package:e_commers_app/features/favorites/cubit/favorites_cubit.dart';
+import 'package:e_commers_app/features/profile/data/models/user_order_model.dart';
+import 'package:e_commers_app/features/profile/data/models/user_profile_model.dart';
+import 'package:e_commers_app/features/profile/data/repositories/profile_repository.dart';
+import 'package:e_commers_app/features/profile/cubit/profile_cubit.dart';
+import 'package:e_commers_app/features/profile/cubit/profile_state.dart';
 import 'package:e_commers_app/main.dart';
 
 // Mock ProductRepository for unit testing
@@ -92,6 +98,44 @@ class MockAuthRepository implements AuthRepository {
   @override
   Future<bool> isAuthenticated() async =>
       savedToken != null && savedToken!.isNotEmpty;
+}
+
+// Mock ProfileRepository for unit testing
+class MockProfileRepository implements ProfileRepository {
+  final UserProfileModel? profile;
+  final List<UserOrderModel> orders;
+  final bool shouldThrow;
+
+  MockProfileRepository({
+    this.profile,
+    this.orders = const [],
+    this.shouldThrow = false,
+  });
+
+  @override
+  Future<UserProfileModel> getProfile() async {
+    if (shouldThrow) throw const NetworkException('Failed to load profile');
+    return profile ??
+        UserProfileModel(
+          id: 2,
+          email: 'morrison@gmail.com',
+          username: 'mor_2314',
+          phone: '1-570-236-7033',
+          name: UserName(firstname: 'david', lastname: 'morrison'),
+          address: UserAddress(
+            city: 'kilcoole',
+            street: 'Lovers Ln',
+            number: 7267,
+            zipcode: '12926-3874',
+          ),
+        );
+  }
+
+  @override
+  Future<List<UserOrderModel>> getOrders(int userId) async {
+    if (shouldThrow) throw const NetworkException('Failed to load orders');
+    return orders;
+  }
 }
 
 void main() {
@@ -171,7 +215,7 @@ void main() {
       cubit.close();
     });
 
-    test('State transitions emit expected states', () {
+    test('State transitions emit expected states across all 4 tabs', () {
       final cubit = nav.NavigationCubit();
 
       cubit.showSignUp();
@@ -189,13 +233,17 @@ void main() {
       expect(cubit.state, isA<nav.CartState>());
       expect(cubit.state.tabIndex, 2);
 
+      cubit.showProfile();
+      expect(cubit.state, isA<nav.ProfileNavState>());
+      expect(cubit.state.tabIndex, 3);
+
       cubit.showSignIn();
       expect(cubit.state, isA<nav.SignInState>());
 
       cubit.close();
     });
 
-    test('changeTab switches between Home, Favorites, and Cart', () {
+    test('changeTab switches between all 4 tabs', () {
       final cubit = nav.NavigationCubit();
 
       cubit.changeTab(1);
@@ -205,6 +253,10 @@ void main() {
       cubit.changeTab(2);
       expect(cubit.state, isA<nav.CartState>());
       expect(cubit.state.tabIndex, 2);
+
+      cubit.changeTab(3);
+      expect(cubit.state, isA<nav.ProfileNavState>());
+      expect(cubit.state.tabIndex, 3);
 
       cubit.changeTab(0);
       expect(cubit.state, isA<nav.HomeState>());
@@ -244,7 +296,6 @@ void main() {
         apiClient.post('https://fakestoreapi.com/auth/login', body: {}),
         throwsA(isA<AuthException>()),
       );
-      // Non-transient errors must NOT be retried
       expect(requestCount, 1);
     });
 
@@ -385,6 +436,76 @@ void main() {
     });
   });
 
+  group('Profile Models & Cubit Tests', () {
+    test('UserProfileModel correctly deserializes and formats properties', () {
+      final json = {
+        'id': 2,
+        'email': 'morrison@gmail.com',
+        'username': 'mor_2314',
+        'phone': '1-570-236-7033',
+        'name': {'firstname': 'david', 'lastname': 'morrison'},
+        'address': {
+          'city': 'kilcoole',
+          'street': 'Lovers Ln',
+          'number': 7267,
+          'zipcode': '12926-3874'
+        }
+      };
+
+      final profile = UserProfileModel.fromJson(json);
+
+      expect(profile.id, 2);
+      expect(profile.fullName, 'David Morrison');
+      expect(profile.initials, 'DM');
+      expect(profile.address.formattedAddress,
+          '7267, Lovers Ln, kilcoole, 12926-3874');
+    });
+
+    test('UserOrderModel calculates totalItemCount and formattedDate', () {
+      final json = {
+        'id': 3,
+        'userId': 2,
+        'date': '2020-03-01T00:00:00.000Z',
+        'products': [
+          {'productId': 1, 'quantity': 2},
+          {'productId': 9, 'quantity': 1}
+        ]
+      };
+
+      final order = UserOrderModel.fromJson(json);
+
+      expect(order.id, 3);
+      expect(order.userId, 2);
+      expect(order.totalItemCount, 3);
+      expect(order.formattedDate, '2020-03-01');
+    });
+
+    test('ProfileCubit loads profile and orders via MockProfileRepository',
+        () async {
+      final mockProfileRepo = MockProfileRepository(
+        orders: [
+          UserOrderModel(
+            id: 3,
+            userId: 2,
+            date: DateTime(2020, 3, 1),
+            products: [
+              OrderProductItem(productId: 1, quantity: 2),
+            ],
+          )
+        ],
+      );
+
+      final cubit = ProfileCubit(repository: mockProfileRepo);
+      await cubit.loadProfile();
+
+      expect(cubit.state, isA<ProfileLoaded>());
+      final loaded = cubit.state as ProfileLoaded;
+      expect(loaded.profile.username, 'mor_2314');
+      expect(loaded.orders.length, 1);
+      cubit.close();
+    });
+  });
+
   group('App Smoke & Navigation Tests', () {
     testWidgets('Renders SignInPage on initial launch',
         (WidgetTester tester) async {
@@ -398,6 +519,10 @@ void main() {
                 BlocProvider(create: (context) => AuthCubit()),
                 BlocProvider(create: (context) => FavoritesCubit()),
                 BlocProvider(create: (context) => CartCubit()),
+                BlocProvider(
+                    create: (context) =>
+                        ProfileCubit(repository: MockProfileRepository())),
+                BlocProvider(create: (context) => NetworkMonitorCubit()),
               ],
               child: const MyApp(),
             );
@@ -411,7 +536,8 @@ void main() {
       expect(find.text('Sign In'), findsWidgets);
     });
 
-    testWidgets('Renders MainScreen with IndexedStack when in HomeState',
+    testWidgets(
+        'Renders MainScreen with 4-tab BottomNavigationBar when in HomeState',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         Sizer(
@@ -427,6 +553,10 @@ void main() {
                 BlocProvider(create: (context) => AuthCubit(isLoggedIn: true)),
                 BlocProvider(create: (context) => FavoritesCubit()),
                 BlocProvider(create: (context) => CartCubit()),
+                BlocProvider(
+                    create: (context) =>
+                        ProfileCubit(repository: MockProfileRepository())),
+                BlocProvider(create: (context) => NetworkMonitorCubit()),
               ],
               child: const MyApp(),
             );
@@ -436,10 +566,16 @@ void main() {
 
       await tester.pump();
 
-      // Verify MainScreen and BottomNavigationBar exist
+      // Verify MainScreen and BottomNavigationBar with 4 tabs exist
       expect(find.byType(MainScreen), findsOneWidget);
       expect(find.byType(IndexedStack), findsOneWidget);
       expect(find.byType(BottomNavigationBar), findsOneWidget);
+
+      final bottomNav = tester.widget<BottomNavigationBar>(
+        find.byType(BottomNavigationBar),
+      );
+      expect(bottomNav.items.length, 4);
+      expect(bottomNav.items[3].label, 'Profile');
     });
   });
 }

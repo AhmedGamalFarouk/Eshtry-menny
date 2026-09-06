@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../navigation_cubit.dart';
 import '../widgets/bottom_nav_bar.dart';
+import '../widgets/offline_banner.dart';
 import '../../features/auth/cubit/auth_cubit.dart';
 import '../../features/home/views/home_page_ui.dart';
 import '../../features/favorites/views/favorites_screen.dart';
 import '../../features/cart/views/cart_screen.dart';
+import '../../features/profile/views/profile_screen.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -22,18 +24,29 @@ class MainScreen extends StatelessWidget {
         builder: (context, state) {
           final int currentIndex = (state is HomeState ||
                   state is FavoritesState ||
-                  state is CartState)
+                  state is CartState ||
+                  state is ProfileNavState)
               ? state.tabIndex
               : 0;
 
           return Scaffold(
-            body: IndexedStack(
-              index: currentIndex,
-              children: const [
-                HomePage(),
-                FavoritesScreen(),
-                CartScreen(),
-              ],
+            body: SafeArea(
+              child: Column(
+                children: [
+                  const OfflineBanner(),
+                  Expanded(
+                    child: IndexedStack(
+                      index: currentIndex,
+                      children: const [
+                        HomePage(),
+                        FavoritesScreen(),
+                        CartScreen(),
+                        ProfileScreen(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             bottomNavigationBar: const BottomNavBar(),
           );

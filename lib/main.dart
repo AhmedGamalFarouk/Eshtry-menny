@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import 'core/navigation_cubit.dart';
+import 'core/network/network_monitor_cubit.dart';
 import 'core/views/main_screen.dart';
 import 'features/auth/cubit/auth_cubit.dart';
 import 'features/auth/views/signin_ui.dart';
@@ -12,6 +13,7 @@ import 'features/auth/views/signup_ui.dart';
 import 'features/cart/cubit/cart_cubit.dart';
 import 'features/favorites/cubit/favorites_cubit.dart';
 import 'features/home/cubit/product_cubit.dart';
+import 'features/profile/cubit/profile_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +35,8 @@ void main() async {
           BlocProvider(create: (context) => AuthCubit(isLoggedIn: isLoggedIn)),
           BlocProvider(create: (context) => FavoritesCubit()),
           BlocProvider(create: (context) => CartCubit()),
+          BlocProvider(create: (context) => ProfileCubit()),
+          BlocProvider(create: (context) => NetworkMonitorCubit()),
         ],
         child: const MyApp(),
       );

@@ -26,6 +26,10 @@ class CartState extends NavigationState {
   const CartState() : super(tabIndex: 2);
 }
 
+class ProfileNavState extends NavigationState {
+  const ProfileNavState() : super(tabIndex: 3);
+}
+
 // Navigation Cubit
 class NavigationCubit extends Cubit<NavigationState> {
   NavigationCubit({NavigationState? initialState})
@@ -36,6 +40,7 @@ class NavigationCubit extends Cubit<NavigationState> {
   void showHome() => emit(const HomeState());
   void showFavorites() => emit(const FavoritesState());
   void showCart() => emit(const CartState());
+  void showProfile() => emit(const ProfileNavState());
 
   void changeTab(int index) {
     switch (index) {
@@ -47,6 +52,9 @@ class NavigationCubit extends Cubit<NavigationState> {
         break;
       case 2:
         emit(const CartState());
+        break;
+      case 3:
+        emit(const ProfileNavState());
         break;
       default:
         emit(const HomeState());

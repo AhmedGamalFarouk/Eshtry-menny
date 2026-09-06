@@ -8,7 +8,9 @@ class ApiEndpoints {
       '$baseUrl/products/category/$category';
   static String productDetails(int id) => '$baseUrl/products/$id';
 
-  // Auth
+  // Auth & Users
   static const String login = '$baseUrl/auth/login';
   static const String users = '$baseUrl/users';
+  static String user(int id) => '$baseUrl/users/$id';
+  static String userCarts(int userId) => '$baseUrl/carts/user/$userId';
 }
