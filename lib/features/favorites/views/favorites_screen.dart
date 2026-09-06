@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -186,47 +187,33 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                               tag: 'favorite_${product['id']}',
                               child: Padding(
                                 padding: EdgeInsets.all(3.w),
-                                child: Image.network(
-                                  product['image'],
+                                child: CachedNetworkImage(
+                                  imageUrl: product['image'],
                                   fit: BoxFit.contain,
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color: const Color(MyColors.background),
-                                        borderRadius: BorderRadius.circular(20),
+                                  placeholder: (context, url) => Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(MyColors.background),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Color(MyColors.primaryRed),
+                                        strokeWidth: 2.5,
                                       ),
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null,
-                                          color:
-                                              const Color(MyColors.primaryRed),
-                                          strokeWidth: 2.5,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color: const Color(MyColors.background),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: const Icon(
-                                        Icons.image_not_supported_rounded,
-                                        color: Color(MyColors.secondaryGrey),
-                                        size: 48,
-                                      ),
-                                    );
-                                  },
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(MyColors.background),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Icon(
+                                      Icons.image_not_supported_rounded,
+                                      color: Color(MyColors.secondaryGrey),
+                                      size: 48,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),

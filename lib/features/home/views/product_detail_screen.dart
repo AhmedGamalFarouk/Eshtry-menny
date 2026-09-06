@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -135,31 +136,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 width: double.infinity,
                 height: double.infinity,
                 padding: EdgeInsets.all(6.w),
-                child: Image.network(
-                  widget.product['image'],
+                child: CachedNetworkImage(
+                  imageUrl: widget.product['image'],
                   fit: BoxFit.contain,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                        color: const Color(MyColors.primaryRed),
-                        strokeWidth: 3,
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Center(
-                      child: Icon(
-                        Icons.image_not_supported_rounded,
-                        color: Color(MyColors.secondaryGrey),
-                        size: 64,
-                      ),
-                    );
-                  },
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(MyColors.primaryRed),
+                      strokeWidth: 3,
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => const Center(
+                    child: Icon(
+                      Icons.image_not_supported_rounded,
+                      color: Color(MyColors.secondaryGrey),
+                      size: 64,
+                    ),
+                  ),
                 ),
               ),
             ),

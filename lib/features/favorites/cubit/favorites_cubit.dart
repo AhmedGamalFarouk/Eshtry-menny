@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/services/database_helper.dart';
 
 // States
 abstract class FavoritesState {}
@@ -17,24 +18,48 @@ class FavoritesError extends FavoritesState {
 
 // Cubit
 class FavoritesCubit extends Cubit<FavoritesState> {
-  FavoritesCubit() : super(FavoritesInitial());
+  FavoritesCubit() : super(FavoritesInitial()) {
+    loadFavorites();
+  }
 
+  final DatabaseHelper _databaseHelper = DatabaseHelper();
   final List<dynamic> _favorites = [];
 
-  void toggleFavorite(dynamic product) {
-    if (_favorites.any((item) => item['id'] == product['id'])) {
-      _favorites.removeWhere((item) => item['id'] == product['id']);
+  Future<void> loadFavorites() async {
+    try {
+      _favorites.clear();
+      final persisted = await _databaseHelper.getFavorites();
+      _favorites.addAll(persisted);
+      emit(FavoritesLoaded(List.from(_favorites)));
+    } catch (e) {
+      emit(FavoritesLoaded(List.from(_favorites)));
+    }
+  }
+
+  Future<void> toggleFavorite(dynamic product) async {
+    final productId = product['id'];
+    final exists = _favorites.any((item) => item['id'] == productId);
+
+    if (exists) {
+      _favorites.removeWhere((item) => item['id'] == productId);
+      await _databaseHelper.deleteFavorite(productId);
     } else {
       _favorites.add(product);
+      await _databaseHelper.insertFavorite(
+        product is Map<String, dynamic>
+            ? product
+            : Map<String, dynamic>.from(product as Map),
+      );
     }
-    emit(FavoritesLoaded(_favorites));
+    emit(FavoritesLoaded(List.from(_favorites)));
   }
 
   bool isFavorite(dynamic product) {
-    return _favorites.any((item) => item['id'] == product['id']);
+    final productId = product['id'];
+    return _favorites.any((item) => item['id'] == productId);
   }
 
   void getFavorites() {
-    emit(FavoritesLoaded(_favorites));
+    emit(FavoritesLoaded(List.from(_favorites)));
   }
 }

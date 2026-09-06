@@ -350,6 +350,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                             borderRadius: BorderRadius.circular(25),
                             onTap: () {
                               HapticFeedback.mediumImpact();
+                              context.read<CartCubit>().clearCart();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

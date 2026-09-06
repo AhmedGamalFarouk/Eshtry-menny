@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -75,7 +76,6 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
           child: BlocBuilder<CartCubit, CartState>(
             builder: (context, state) {
               if (state is CartInitial) {
-                context.read<CartCubit>().loadCart();
                 return const Center(child: EmptyCart());
               }
               if (state is CartLoaded) {
@@ -205,22 +205,32 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                         width: 28.w,
                         height: 28.w,
                         color: Colors.white,
-                        child: Image.network(
-                          item.image,
+                        child: CachedNetworkImage(
+                          imageUrl: item.image,
                           fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(16),
+                          placeholder: (context, url) => Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: Color(MyColors.primaryRed),
+                                strokeWidth: 2,
                               ),
-                              child: Icon(
-                                Icons.image_not_supported,
-                                color: Colors.grey.shade400,
-                                size: 10.w,
-                              ),
-                            );
-                          },
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Icon(
+                              Icons.image_not_supported,
+                              color: Colors.grey.shade400,
+                              size: 10.w,
+                            ),
+                          ),
                         ),
                       ),
                     ),

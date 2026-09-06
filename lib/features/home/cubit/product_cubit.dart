@@ -1,96 +1,104 @@
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
+import '../data/models/product_model.dart';
 import 'product_state.dart';
 
 class ProductCubit extends Cubit<ProductState> {
   ProductCubit() : super(ProductInitial());
-  List<dynamic> _allProducts = [];
-  List<dynamic> _filteredProducts = [];
-  String? _selectedCategory;
-  List<String> _categories = [];
 
-  Future<void> fetchCategories() async {
+  List<ProductModel> _allProducts = [];
+  List<String> _categories = ['All'];
+  String _selectedCategory = 'All';
+  String _searchQuery = '';
+
+  List<String> get categories => _categories;
+  String get selectedCategory => _selectedCategory;
+  String get searchQuery => _searchQuery;
+
+  /// Loads both categories and all products concurrently with error handling.
+  Future<void> loadInitialData() async {
     try {
-      emit(ProductLoading());
-      final response = await http
-          .get(Uri.parse('https://fakestoreapi.com/products/categories'));
-      if (response.statusCode == 200) {
-        final List<dynamic> rawCategories = json.decode(response.body);
-        _categories = rawCategories.map((category) => category.toString()).toList();
-        // Add "All" category at the beginning
-        _categories.insert(0, 'All');
-        // Set "All" as default selected category if none is selected
-        if (_selectedCategory == null) {
-          _selectedCategory = 'All';
-        }
-        emit(CategoryLoaded(_categories, selectedCategory: _selectedCategory));
+      emit(ProductLoading(
+        categories: _categories,
+        selectedCategory: _selectedCategory,
+      ));
+
+      final results = await Future.wait([
+        http
+            .get(Uri.parse('https://fakestoreapi.com/products/categories'))
+            .timeout(const Duration(seconds: 15)),
+        http
+            .get(Uri.parse('https://fakestoreapi.com/products'))
+            .timeout(const Duration(seconds: 15)),
+      ]);
+
+      final categoriesResponse = results[0];
+      final productsResponse = results[1];
+
+      if (categoriesResponse.statusCode == 200 &&
+          productsResponse.statusCode == 200) {
+        final List<dynamic> rawCategories =
+            json.decode(categoriesResponse.body);
+        _categories = ['All', ...rawCategories.map((c) => c.toString())];
+
+        final List<dynamic> rawProducts = json.decode(productsResponse.body);
+        _allProducts = rawProducts
+            .map((item) => ProductModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+
+        _emitFilteredProducts();
       } else {
-        emit(ProductError('Failed to load categories: ${response.statusCode}'));
+        emit(ProductError(
+            'Failed to load products: status ${productsResponse.statusCode}'));
       }
     } catch (e) {
-      emit(ProductError(e.toString()));
+      emit(ProductError('Connection error: $e'));
     }
   }
 
-  Future<void> fetchAllProducts() async {
-    try {
-      emit(ProductLoading(categories: _categories, selectedCategory: _selectedCategory));
-      final response =
-          await http.get(Uri.parse('https://fakestoreapi.com/products'));
-      if (response.statusCode == 200) {
-        _allProducts = json.decode(response.body);
-        _filteredProducts = _allProducts;
-        emit(ProductsLoaded(_filteredProducts, categories: _categories, selectedCategory: _selectedCategory));
-      } else {
-        emit(ProductError('Failed to load products: ${response.statusCode}'));
-      }
-    } catch (e) {
-      emit(ProductError(e.toString()));
-    }
-  }
-
+  /// Selects a category and instantly filters products in-memory.
   void selectCategory(String category) {
     _selectedCategory = category;
-    emit(CategoryLoaded(_categories, selectedCategory: _selectedCategory));
-    
-    if (category == 'All') {
-      fetchAllProducts();
-    } else {
-      fetchProductsByCategory(category);
-    }
+    _emitFilteredProducts();
   }
 
-  Future<void> fetchProductsByCategory(String category) async {
-    try {
-      emit(ProductLoading(categories: _categories, selectedCategory: _selectedCategory));
-      final response = await http.get(
-          Uri.parse('https://fakestoreapi.com/products/category/$category'));
-      if (response.statusCode == 200) {
-        final products = json.decode(response.body);
-        emit(ProductsLoaded(products, categories: _categories, selectedCategory: _selectedCategory));
-      }
-    } catch (e) {
-      emit(ProductError(e.toString()));
-    }
+  /// Searches products across title, category, and description.
+  void searchProducts(String query) {
+    _searchQuery = query.trim();
+    _emitFilteredProducts();
   }
 
-  void filterProducts(String query) {
-    if (query.isEmpty) {
-      _filteredProducts = _allProducts;
-    } else {
-      _filteredProducts = _allProducts.where((product) {
-        final titleMatch = product['title']
-            .toString()
-            .toLowerCase()
-            .contains(query.toLowerCase());
-        final categoryMatch = product['category']
-            .toString()
-            .toLowerCase()
-            .contains(query.toLowerCase());
-        return titleMatch || categoryMatch;
-      }).toList();
-    }
-    emit(ProductsLoaded(_filteredProducts, categories: _categories, selectedCategory: _selectedCategory));
+  /// Refreshes all products from network.
+  Future<void> refresh() async {
+    await loadInitialData();
+  }
+
+  /// Backward-compatible aliases
+  Future<void> fetchCategories() => loadInitialData();
+  Future<void> fetchAllProducts() => loadInitialData();
+  void filterProducts(String query) => searchProducts(query);
+
+  void _emitFilteredProducts() {
+    final filtered = _allProducts.where((product) {
+      final matchesCategory = _selectedCategory == 'All' ||
+          product.category.toLowerCase() == _selectedCategory.toLowerCase();
+
+      final matchesSearch = _searchQuery.isEmpty ||
+          product.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          product.category.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          product.description
+              .toLowerCase()
+              .contains(_searchQuery.toLowerCase());
+
+      return matchesCategory && matchesSearch;
+    }).toList();
+
+    emit(ProductsLoaded(
+      products: filtered,
+      categories: _categories,
+      selectedCategory: _selectedCategory,
+      searchQuery: _searchQuery,
+    ));
   }
 }

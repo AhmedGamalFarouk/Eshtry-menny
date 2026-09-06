@@ -1,18 +1,17 @@
-import 'package:e_commers_app/core/constants/mycolors.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sizer/sizer.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
+import '../../../core/constants/mycolors.dart';
 import '../../../core/widgets/bottom_nav_bar.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../../cart/cubit/cart_cubit.dart';
 import '../../favorites/cubit/favorites_cubit.dart';
 import '../cubit/product_cubit.dart';
 import '../cubit/product_state.dart';
+import '../data/models/product_model.dart';
 import 'categories_top_row.dart';
 import 'product_detail_screen.dart';
 
@@ -24,16 +23,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<dynamic> products = [];
-  List<dynamic> filteredProducts = [];
-  bool isLoading = true;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    context.read<ProductCubit>().fetchCategories();
-    fetchProducts();
+    context.read<ProductCubit>().loadInitialData();
   }
 
   @override
@@ -42,62 +37,16 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  void filterProducts(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        filteredProducts = products;
-      } else {
-        filteredProducts = products.where((product) {
-          final titleMatch = product['title']
-              .toString()
-              .toLowerCase()
-              .contains(query.toLowerCase());
-          final categoryMatch = product['category']
-              .toString()
-              .toLowerCase()
-              .contains(query.toLowerCase());
-          return titleMatch || categoryMatch;
-        }).toList();
-      }
-    });
-  }
-
-  Future<void> fetchProducts() async {
-    try {
-      final response =
-          await http.get(Uri.parse('https://fakestoreapi.com/products'));
-      if (response.statusCode == 200) {
-        setState(() {
-          products = json.decode(response.body);
-          filteredProducts = products;
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      Fluttertoast.showToast(
-          msg: "Error fetching products: $e'",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(MyColors.background),
+      backgroundColor: const Color(MyColors.background),
       bottomNavigationBar: const BottomNavBar(),
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
         title: 'Discover',
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 10.w),
+        padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 2.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -107,7 +56,7 @@ class _HomePageState extends State<HomePage> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -115,33 +64,37 @@ class _HomePageState extends State<HomePage> {
               ),
               child: TextField(
                 controller: _searchController,
-                onChanged: filterProducts,
+                onChanged: (query) {
+                  context.read<ProductCubit>().searchProducts(query);
+                  setState(() {});
+                },
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: const Color(MyColors.textfieldBakground),
                   hintText: 'Search products...',
-                  hintStyle: TextStyle(
-                    color: const Color(MyColors.secondaryGrey),
+                  hintStyle: const TextStyle(
+                    color: Color(MyColors.secondaryGrey),
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
                   ),
                   prefixIcon: Container(
                     padding: const EdgeInsets.all(12),
-                    child: Icon(
+                    child: const Icon(
                       Icons.search_rounded,
-                      color: const Color(MyColors.secondaryGrey),
+                      color: Color(MyColors.secondaryGrey),
                       size: 24,
                     ),
                   ),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.clear_rounded,
-                            color: const Color(MyColors.secondaryGrey),
+                            color: Color(MyColors.secondaryGrey),
                           ),
                           onPressed: () {
                             _searchController.clear();
-                            filterProducts('');
+                            context.read<ProductCubit>().searchProducts('');
+                            setState(() {});
                           },
                         )
                       : null,
@@ -170,102 +123,34 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 2.h),
             BlocBuilder<ProductCubit, ProductState>(
               builder: (context, state) {
-                if (state is CategoryLoaded) {
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: state.categories.map((category) {
-                        final isSelected = state.selectedCategory == category;
-                        return Padding(
-                          padding: EdgeInsets.only(right: 3.w),
-                          child: CategoriesTopRow(
-                            text: category,
-                            isSelected: isSelected,
-                            onTap: () {
-                              context
-                                  .read<ProductCubit>()
-                                  .selectCategory(category);
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  );
+                List<String> categories = ['All'];
+                String selectedCategory = 'All';
+                if (state is ProductsLoaded) {
+                  categories = state.categories;
+                  selectedCategory = state.selectedCategory;
                 } else if (state is ProductLoading && state.categories != null) {
-                  // Show categories during loading to maintain visibility
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: state.categories!.map((category) {
-                        final isSelected = state.selectedCategory == category;
-                        return Padding(
-                          padding: EdgeInsets.only(right: 3.w),
-                          child: CategoriesTopRow(
-                            text: category,
-                            isSelected: isSelected,
-                            onTap: () {
-                              context
-                                  .read<ProductCubit>()
-                                  .selectCategory(category);
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  );
-                } else if (state is ProductsLoaded && state.categories != null) {
-                  // Show categories when products are loaded
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: state.categories!.map((category) {
-                        final isSelected = state.selectedCategory == category;
-                        return Padding(
-                          padding: EdgeInsets.only(right: 3.w),
-                          child: CategoriesTopRow(
-                            text: category,
-                            isSelected: isSelected,
-                            onTap: () {
-                              context
-                                  .read<ProductCubit>()
-                                  .selectCategory(category);
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  );
+                  categories = state.categories!;
+                  selectedCategory = state.selectedCategory ?? 'All';
                 }
-                // Show loading placeholder for categories to maintain row visibility
-                return Container(
-                  height: 50,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: List.generate(5, (index) => 
-                        Padding(
-                          padding: EdgeInsets.only(right: 3.w),
-                          child: Container(
-                            width: 80,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              color: const Color(MyColors.textfieldBakground),
-                            ),
-                            child: Center(
-                              child: Container(
-                                width: 40,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(6),
-                                  color: const Color(MyColors.secondaryGrey).withOpacity(0.3),
-                                ),
-                              ),
-                            ),
-                          ),
+
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: categories.map((category) {
+                      final isSelected = selectedCategory == category;
+                      return Padding(
+                        padding: EdgeInsets.only(right: 3.w),
+                        child: CategoriesTopRow(
+                          text: category,
+                          isSelected: isSelected,
+                          onTap: () {
+                            context
+                                .read<ProductCubit>()
+                                .selectCategory(category);
+                          },
                         ),
-                      ),
-                    ),
+                      );
+                    }).toList(),
                   ),
                 );
               },
@@ -275,22 +160,78 @@ class _HomePageState extends State<HomePage> {
               child: BlocBuilder<ProductCubit, ProductState>(
                 builder: (context, state) {
                   if (state is ProductLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (state is ProductsLoaded) {
-                    return buildProductGrid(state.products);
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(MyColors.primaryRed),
+                      ),
+                    );
                   } else if (state is ProductError) {
-                    Fluttertoast.showToast(
-                        msg: "Failed to load products",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.red,
-                        textColor: Colors.white,
-                        fontSize: 16.0);
-                    return const Center(child: CircularProgressIndicator());
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.cloud_off_rounded,
+                            size: 64,
+                            color: Color(MyColors.secondaryGrey),
+                          ),
+                          SizedBox(height: 2.h),
+                          Text(
+                            state.message,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Color(MyColors.textSecondary),
+                              fontSize: 14,
+                            ),
+                          ),
+                          SizedBox(height: 2.h),
+                          ElevatedButton(
+                            onPressed: () {
+                              context.read<ProductCubit>().loadInitialData();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(MyColors.primaryRed),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            child: const Text(
+                              'Try Again',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else if (state is ProductsLoaded) {
+                    if (state.products.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.search_off_rounded,
+                              size: 64,
+                              color: Color(MyColors.secondaryGrey),
+                            ),
+                            SizedBox(height: 2.h),
+                            Text(
+                              state.searchQuery.isNotEmpty
+                                  ? 'No products found matching "${state.searchQuery}"'
+                                  : 'No products in category "${state.selectedCategory}"',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Color(MyColors.textSecondary),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return buildProductGrid(state.products);
                   }
-                  return buildProductGrid(
-                      filteredProducts); // Use filteredProducts instead of products
+                  return const SizedBox.shrink();
                 },
               ),
             ),
@@ -300,7 +241,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildProductGrid(List<dynamic> products) {
+  Widget buildProductGrid(List<ProductModel> products) {
     return GridView.builder(
       padding: EdgeInsets.all(4.w),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -312,6 +253,7 @@ class _HomePageState extends State<HomePage> {
       itemCount: products.length,
       itemBuilder: (context, index) {
         final product = products[index];
+        final productMap = product.toMap();
         return Material(
           color: Colors.transparent,
           child: InkWell(
@@ -321,7 +263,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProductDetailScreen(product: product),
+                  builder: (context) => ProductDetailScreen(product: productMap),
                 ),
               );
             },
@@ -333,18 +275,20 @@ class _HomePageState extends State<HomePage> {
                   end: Alignment.bottomRight,
                   colors: [
                     const Color(MyColors.textfieldBakground),
-                    const Color(MyColors.textfieldBakground).withOpacity(0.8),
+                    const Color(MyColors.textfieldBakground)
+                        .withValues(alpha: 0.8),
                   ],
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
+                    color: Colors.black.withValues(alpha: 0.15),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                     spreadRadius: 0,
                   ),
                   BoxShadow(
-                    color: const Color(MyColors.primaryRed).withOpacity(0.05),
+                    color:
+                        const Color(MyColors.primaryRed).withValues(alpha: 0.05),
                     blurRadius: 30,
                     offset: const Offset(0, 15),
                     spreadRadius: -5,
@@ -354,240 +298,229 @@ class _HomePageState extends State<HomePage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(25),
                 child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Product image with hero animation
-                Expanded(
-                  flex: 3,
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.white,
-                          Colors.white.withOpacity(0.95),
-                        ],
-                      ),
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(25),
-                      ),
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: Hero(
-                            tag: 'product_${product['id']}',
-                            child: Padding(
-                              padding: EdgeInsets.all(3.w),
-                              child: Image.network(
-                                product['image'],
-                                fit: BoxFit.contain,
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      color: const Color(MyColors.background),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null,
-                                        color: const Color(MyColors.primaryRed),
-                                        strokeWidth: 2.5,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      color: const Color(MyColors.background),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: const Icon(
-                                      Icons.image_not_supported_rounded,
-                                      color: Color(MyColors.secondaryGrey),
-                                      size: 48,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Product image with hero animation
+                    Expanded(
+                      flex: 3,
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.white,
+                              Colors.white.withValues(alpha: 0.95),
+                            ],
+                          ),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(25),
                           ),
                         ),
-                        // Favorite button overlay
-                        Positioned(
-                          top: 2.w,
-                          right: 2.w,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: context
-                                      .watch<FavoritesCubit>()
-                                      .isFavorite(product)
-                                  ? const Color(MyColors.primaryRed)
-                                  : Colors.white.withOpacity(0.9),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: IconButton(
-                              constraints: const BoxConstraints(),
-                              padding: EdgeInsets.all(2.w),
-                              icon: Icon(
-                                context
-                                        .watch<FavoritesCubit>()
-                                        .isFavorite(product)
-                                    ? Icons.favorite_rounded
-                                    : Icons.favorite_border_rounded,
-                                color: context
-                                        .watch<FavoritesCubit>()
-                                        .isFavorite(product)
-                                    ? Colors.white
-                                    : const Color(MyColors.primaryRed),
-                                size: 20,
-                              ),
-                              onPressed: () {
-                                HapticFeedback.lightImpact();
-                                context
-                                    .read<FavoritesCubit>()
-                                    .toggleFavorite(product);
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                // Product details
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: EdgeInsets.all(4.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Product title
-                        Flexible(
-                          child: Text(
-                            product['title'],
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: const Color(MyColors.textColor),
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.w600,
-                              height: 1.3,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 0.5.h),
-                        // Price and cart button row
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                        child: Stack(
                           children: [
-                            // Price
-                            Expanded(
-                              child: Text(
-                                '\$${product['price'].toStringAsFixed(2)}',
-                                style: TextStyle(
-                                  color: const Color(MyColors.primaryRed),
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.bold,
+                            Positioned.fill(
+                              child: Hero(
+                                tag: 'product_${product.id}',
+                                child: Padding(
+                                  padding: EdgeInsets.all(3.w),
+                                  child: CachedNetworkImage(
+                                    imageUrl: product.image,
+                                    fit: BoxFit.contain,
+                                    placeholder: (context, url) => Container(
+                                      decoration: BoxDecoration(
+                                        color: const Color(MyColors.background),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Color(MyColors.primaryRed),
+                                          strokeWidth: 2.5,
+                                        ),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                      decoration: BoxDecoration(
+                                        color: const Color(MyColors.background),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: const Icon(
+                                        Icons.image_not_supported_rounded,
+                                        color: Color(MyColors.secondaryGrey),
+                                        size: 48,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            // Enhanced cart button
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                gradient: context
-                                        .watch<CartCubit>()
-                                        .isInCart(product)
-                                    ? LinearGradient(
-                                        colors: [
-                                          const Color(MyColors.success),
-                                          const Color(MyColors.success)
-                                              .withOpacity(0.8),
-                                        ],
-                                      )
-                                    : LinearGradient(
-                                        colors: [
-                                          const Color(MyColors.primaryRed),
-                                          const Color(MyColors.primaryRedLight),
-                                        ],
-                                      ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: (context
-                                                .watch<CartCubit>()
-                                                .isInCart(product)
-                                            ? const Color(MyColors.success)
-                                            : const Color(MyColors.primaryRed))
-                                        .withOpacity(0.3),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
+                            // Favorite button overlay
+                            Positioned(
+                              top: 2.w,
+                              right: 2.w,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: context
+                                          .watch<FavoritesCubit>()
+                                          .isFavorite(productMap)
+                                      ? const Color(MyColors.primaryRed)
+                                      : Colors.white.withValues(alpha: 0.9),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.1),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: IconButton(
+                                  constraints: const BoxConstraints(),
+                                  padding: EdgeInsets.all(2.w),
+                                  icon: Icon(
+                                    context
+                                            .watch<FavoritesCubit>()
+                                            .isFavorite(productMap)
+                                        ? Icons.favorite_rounded
+                                        : Icons.favorite_border_rounded,
+                                    color: context
+                                            .watch<FavoritesCubit>()
+                                            .isFavorite(productMap)
+                                        ? Colors.white
+                                        : const Color(MyColors.primaryRed),
+                                    size: 20,
                                   ),
-                                ],
-                              ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(15),
-                                  onTap: () {
-                                    HapticFeedback.mediumImpact();
-                                    context.read<CartCubit>().addToCart(
-                                          id: product['id'],
-                                          title: product['title'],
-                                          price: product['price'].toDouble(),
-                                          image: product['image'],
-                                        );
+                                  onPressed: () {
+                                    HapticFeedback.lightImpact();
+                                    context
+                                        .read<FavoritesCubit>()
+                                        .toggleFavorite(productMap);
                                   },
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 3.w,
-                                      vertical: 1.5.h,
-                                    ),
-                                    child: Icon(
-                                      context
-                                              .watch<CartCubit>()
-                                              .isInCart(product)
-                                          ? Icons.check_rounded
-                                          : Icons.add_shopping_cart_rounded,
-                                      color: Colors.white,
-                                      size: 18,
-                                    ),
-                                  ),
                                 ),
                               ),
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    // Product details
+                    Expanded(
+                      flex: 2,
+                      child: Padding(
+                        padding: EdgeInsets.all(4.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Product title
+                            Flexible(
+                              child: Text(
+                                product.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: const Color(MyColors.textColor),
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.3,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 0.5.h),
+                            // Price and cart button row
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                // Price
+                                Expanded(
+                                  child: Text(
+                                    '\$${product.price.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      color: const Color(MyColors.primaryRed),
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                // Enhanced cart button
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    gradient: context
+                                            .watch<CartCubit>()
+                                            .isInCart(productMap)
+                                        ? LinearGradient(
+                                            colors: [
+                                              const Color(MyColors.success),
+                                              const Color(MyColors.success)
+                                                  .withValues(alpha: 0.8),
+                                            ],
+                                          )
+                                        : const LinearGradient(
+                                            colors: [
+                                              Color(MyColors.primaryRed),
+                                              Color(MyColors.primaryRedLight),
+                                            ],
+                                          ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: (context
+                                                    .watch<CartCubit>()
+                                                    .isInCart(productMap)
+                                                ? const Color(MyColors.success)
+                                                : const Color(
+                                                    MyColors.primaryRed))
+                                            .withValues(alpha: 0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(15),
+                                      onTap: () {
+                                        HapticFeedback.mediumImpact();
+                                        context.read<CartCubit>().addToCart(
+                                              id: product.id,
+                                              title: product.title,
+                                              price: product.price,
+                                              image: product.image,
+                                            );
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 3.w,
+                                          vertical: 1.5.h,
+                                        ),
+                                        child: Icon(
+                                          context
+                                                  .watch<CartCubit>()
+                                                  .isInCart(productMap)
+                                              ? Icons.check_rounded
+                                              : Icons.add_shopping_cart_rounded,
+                                          color: Colors.white,
+                                          size: 18,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
             ),
           ),
         );
