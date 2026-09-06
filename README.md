@@ -1,6 +1,6 @@
 # Eshtry-menny 🛒
 
-Eshtry-menny is a modern Flutter e-commerce application that provides a seamless shopping experience with a clean, intuitive interface. The app features comprehensive product browsing, category filtering, cart management, favorites, and user authentication.
+Eshtry-menny is a modern, high-end Flutter e-commerce application engineered with clean architecture, robust resilience mechanisms, and a dark luxury editorial design system. The app features comprehensive product browsing, category filtering, cart management with SQLite persistence, wishlists, order history tracking, and user authentication.
 
 ## 📱 Screens
 
@@ -18,37 +18,71 @@ Eshtry-menny is a modern Flutter e-commerce application that provides a seamless
 
 ## ✨ Features
 
+### 🎨 Editorial Dark Luxury UI/UX
+- **Obsidian Dark Palette**: Deep background (`#14151E`), slate surfaces (`#1D1F2A`), and card surfaces (`#1C1E2B`) with subtle 12% white borders (`0x1FFFFFFF`) for visual depth.
+- **Coral-Crimson Accent**: Refined interactive accent (`#FF3B56`) reserved for primary CTAs, active states, and live cart badges.
+- **Tactile Haptic Feedback**: Light and medium haptics on item addition, quantity changes, favorite toggles, and order placement.
+- **Responsive Layout**: Fluid layouts across phone and tablet screens.
+
 ### 🔐 Authentication
-- User registration and sign-in functionality
+- User sign-up and sign-in integrated with [FakeStore API](https://fakestoreapi.com/)
 - State-managed authentication flow using BLoC/Cubit
-- One-tap demo test login
+- **1-Tap Demo Login**: Pre-filled test credentials card for quick review
 
-### 🏪 Shopping Experience
-- Browse products integrated with [FakeStore API](https://fakestoreapi.com/)
-- Product categories and synchronized real-time search
-- Detailed product views with image gallery, ratings, and descriptions
+### 🏪 Product Discovery & Details
+- Browse full catalog with in-memory category filtering
+- Real-time search with clear actions and empty state illustration
+- High-contrast squircle product cards with star ratings and instant cart action
+- Rich Product Detail Screen with 38% hero view, quality guarantee badges, and sticky purchase drawer
 
-### 🛍️ Cart & Favorites
-- Add and remove items to/from shopping cart
-- Local persistence with SQLite
-- Quantity management and live price calculation
-- Wishlist / favorites functionality persisted locally across sessions
-- Checkout flow with order confirmation
+### 🛍️ Cart, Wishlist & Checkout
+- **Cart Management**: Add/remove items, stepper controls (`-`, qty, `+`), and swipe-to-delete with red trash background
+- **Local Persistence**: Both shopping cart and favorites saved in SQLite via `sqflite`
+- **Bottom Nav Cart Badge**: Dynamically displays real-time cart item count across all screens
+- **Checkout Flow**: Interactive payment method selection (Credit Card & PayPal), shipping address fields, and order summary
+- **Celebratory Order Status**: Animated checkmark, simulated order ID (`#ESH-...`) with 1-tap clipboard copy, and receipt breakdown
 
-### 📱 User Interface
-- Modern Material Design dark theme
-- Responsive layout across various screen sizes using Sizer
-- High-performance image caching with `cached_network_image`
-- Interactive animations and haptic feedback
-- Floating toast notifications
+### 👤 Member Profile & Order History
+- Verified Member card with gradient initials avatar and contact details
+- Shipping location address card
+- Order History timeline cards with item counts, dates, and `Delivered` status chips
+- Secure account sign-out dialog
+
+## 🏗️ Architecture & Engineering
+
+The codebase adheres to **Clean Architecture** principles and domain-driven design:
+
+```
+lib/
+├── core/
+│   ├── constants/       # App colors, design tokens, and theme constants
+│   ├── navigation_cubit # Top-level tab and authentication routing cubit
+│   ├── network/         # ApiClient with retry, jitter, timeout, & typed exceptions
+│   ├── services/        # Local SQLite database helper
+│   ├── theme/           # Global dark theme configuration
+│   └── widgets/         # CustomAppBar, BottomNavBar, and shared components
+├── features/
+│   ├── auth/            # AuthCubit, AuthRepository, SignIn & SignUp screens
+│   ├── cart/            # CartCubit, CartScreen, CheckoutScreen, OrderSuccessScreen
+│   ├── favorites/       # FavoritesCubit, FavoritesScreen, EmptyFavorites
+│   ├── home/            # ProductCubit, ProductRepository, Home & ProductDetail
+│   └── profile/         # ProfileCubit, ProfileRepository, ProfileScreen
+└── main.dart            # Application entry point & dependency injection
+```
+
+### 🛡️ Network Resilience & Error Handling
+- **`ApiClient`**: Centralized HTTP client with exponential backoff and random jitter for 5xx errors and transient connection failures.
+- **Fail-Fast Policy**: 4xx client errors (such as 401 Unauthorized) fail immediately without wasteful retries.
+- **Typed Exceptions**: Clean domain exceptions (`NetworkException`, `AuthException`, `ServerException`, `ClientException`) with friendly user-facing messages.
+- **`NetworkMonitorCubit`**: Real-time connectivity monitoring.
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Flutter SDK (latest stable version)
-- Dart SDK
+- Flutter SDK (3.24.0+ recommended)
+- Dart SDK (3.5.0+)
 - Android Studio / VS Code
-- Android/iOS emulator or physical device
+- Android / iOS emulator or physical device
 
 ### Installation
 
@@ -69,49 +103,34 @@ Eshtry-menny is a modern Flutter e-commerce application that provides a seamless
    ```
 
 ### Demo Credentials
-For testing purposes, you can use:
+For testing and reviewing the application:
 - **Username:** `mor_2314`
 - **Password:** `83r5^_`
-*(or tap the "Test Login" button on the Sign-In screen)*
+*(or tap the "1-Tap Login" button on the Sign In screen)*
 
-## 🏗️ Architecture
+## 🧪 Automated Testing
 
-- **BLoC Pattern**: State management using `flutter_bloc`
-- **Feature-based Structure**: Organized by feature domains (`auth`, `home`, `cart`, `favorites`)
-- **Persistence**: Local SQLite database for both cart and favorites
+The project includes a comprehensive suite of 20 unit and widget tests covering models, repositories, network retry logic, cubits, and screen smoke tests.
 
-### Project Structure
+Run the test suite:
+```bash
+flutter test
 ```
-lib/
-├── core/
-│   ├── constants/     # App colors and design tokens
-│   ├── services/      # Local database helper (SQLite)
-│   ├── theme/         # Application theme configuration
-│   └── widgets/       # Shared UI components
-├── features/
-│   ├── auth/          # Authentication screens and cubits
-│   ├── cart/          # Cart and checkout screens and cubits
-│   ├── favorites/     # Favorites/wishlist screens and cubits
-│   └── home/          # Discovery, search, and product details
-└── main.dart          # Application entry point
+
+Run static analysis:
+```bash
+flutter analyze
 ```
 
 ## 📦 Key Dependencies
 
-- **flutter_bloc** - State management
-- **http** - HTTP requests to FakeStore API
-- **sqflite** & **path** - Local SQLite database
-- **cached_network_image** - Image caching and memory management
-- **sizer** - Responsive sizing engine
-- **equatable** - Value equality for BLoC states
-- **fluttertoast** - Toast feedback
-
-## 🧪 Testing
-
-Run tests using:
-```bash
-flutter test
-```
+- **`flutter_bloc`**: State management & unidirectional data flow
+- **`http`**: API networking client
+- **`sqflite` & `path`**: SQLite local persistence for cart and favorites
+- **`cached_network_image`**: Asynchronous image caching with placeholder spinners
+- **`sizer`**: Responsive device screen adaptation
+- **`equatable`**: Value equality for BLoC states
+- **`shared_preferences`**: Session token persistence
 
 ## 📄 License
 
@@ -120,3 +139,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Built with ❤️ using Flutter**
+

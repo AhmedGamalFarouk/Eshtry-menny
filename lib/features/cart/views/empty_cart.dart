@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 
 import '../../../core/constants/mycolors.dart';
 import '../../../core/navigation_cubit.dart';
@@ -54,111 +53,78 @@ class _EmptyCartState extends State<EmptyCart>
       opacity: _fadeAnimation,
       child: Center(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.w),
+          padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Animated cart illustration
+              // Elevated cart illustration
               ScaleTransition(
                 scale: _scaleAnimation,
                 child: Container(
-                  width: 35.w,
-                  height: 35.w,
+                  width: 120,
+                  height: 120,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        const Color(MyColors.primaryRed).withValues(alpha: 0.1),
-                        const Color(MyColors.primaryRed).withValues(alpha: 0.05),
-                      ],
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.shopping_cart_outlined,
-                    size: 15.w,
-                    color: const Color(MyColors.primaryRed),
-                  ),
-                ),
-              ),
-              SizedBox(height: 4.h),
-              // Main message
-              Text(
-                'Your cart is empty',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: const Color(MyColors.textColor),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.sp,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 1.h),
-              // Subtitle
-              Text(
-                'Looks like you haven\'t added anything to your cart yet.\nStart shopping to fill it up!',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: const Color(MyColors.textSecondary),
-                      fontSize: 12.sp,
-                      height: 1.5,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 5.h),
-              // Shop now button
-              ScaleTransition(
-                scale: _scaleAnimation,
-                child: Container(
-                  width: 60.w,
-                  height: 6.h,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        const Color(MyColors.primaryRed),
-                        const Color(MyColors.primaryRedLight),
-                      ],
+                    color: const Color(MyColors.textfieldBakground),
+                    border: Border.all(
+                      color: const Color(MyColors.borderSubtle),
+                      width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color:
-                            const Color(MyColors.primaryRed).withValues(alpha: 0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
+                        color: const Color(MyColors.primaryRed)
+                            .withValues(alpha: 0.12),
+                        blurRadius: 32,
+                        spreadRadius: 8,
                       ),
                     ],
                   ),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      context.read<NavigationCubit>().showHome();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.shopping_bag_outlined,
+                      size: 48,
+                      color: Color(MyColors.primaryRed),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.shopping_bag_outlined,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          'Start Shopping',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 28),
+              // Main message
+              const Text(
+                'Your Cart is Empty',
+                style: TextStyle(
+                  color: Color(MyColors.textColor),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 22,
+                  letterSpacing: -0.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              // Subtitle
+              const Text(
+                'Explore the latest collections and add your favorite items to your bag.',
+                style: TextStyle(
+                  color: Color(MyColors.textSecondary),
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              // Shop now button
+              ScaleTransition(
+                scale: _scaleAnimation,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    context.read<NavigationCubit>().showHome();
+                  },
+                  icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                  label: const Text('Start Shopping'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(200, 52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                 ),

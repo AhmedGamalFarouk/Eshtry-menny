@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 import '../../../core/constants/mycolors.dart';
 
 class CategoriesTopRow extends StatefulWidget {
@@ -45,8 +44,21 @@ class _CategoriesTopRowState extends State<CategoriesTopRow>
     super.dispose();
   }
 
+  String _formatCategory(String text) {
+    if (text.isEmpty) return text;
+    if (text.toLowerCase() == 'all') return 'All Items';
+    return text
+        .split(' ')
+        .map((word) => word.isNotEmpty
+            ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+            : word)
+        .join(' ');
+  }
+
   @override
   Widget build(BuildContext context) {
+    final displayText = _formatCategory(widget.text);
+
     return GestureDetector(
       onTapDown: (_) => _animationController.forward(),
       onTapUp: (_) => _animationController.reverse(),
@@ -59,45 +71,44 @@ class _CategoriesTopRowState extends State<CategoriesTopRow>
             scale: _scaleAnimation.value,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
+              curve: Curves.easeOutCubic,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
-                color: widget.isSelected 
+                borderRadius: BorderRadius.circular(16),
+                color: widget.isSelected
                     ? const Color(MyColors.primaryRed)
                     : const Color(MyColors.textfieldBakground),
-                boxShadow: widget.isSelected ? [
-                  BoxShadow(
-                    color: const Color(MyColors.primaryRed).withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ] : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-                border: widget.isSelected ? null : Border.all(
-                  color: const Color(MyColors.secondaryGrey).withValues(alpha: 0.2),
+                border: Border.all(
+                  color: widget.isSelected
+                      ? const Color(MyColors.primaryRed)
+                      : const Color(MyColors.borderSubtle),
                   width: 1,
                 ),
+                boxShadow: widget.isSelected
+                    ? [
+                        BoxShadow(
+                          color: const Color(MyColors.primaryRed)
+                              .withValues(alpha: 0.28),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : null,
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               child: Center(
                 child: Text(
-                  widget.text,
+                  displayText,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: widget.isSelected 
+                    color: widget.isSelected
                         ? Colors.white
-                        : const Color(MyColors.textColor),
-                    fontSize: 14.sp,
-                    fontWeight: widget.isSelected 
-                        ? FontWeight.w600 
+                        : const Color(MyColors.textSecondary),
+                    fontSize: 13,
+                    fontWeight: widget.isSelected
+                        ? FontWeight.w600
                         : FontWeight.w500,
-                    letterSpacing: 0.5,
+                    letterSpacing: -0.1,
                   ),
                 ),
               ),

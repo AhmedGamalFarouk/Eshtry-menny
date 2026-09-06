@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sizer/sizer.dart';
 
 import '../../../core/constants/mycolors.dart';
 import '../../../core/widgets/custom_app_bar.dart';
@@ -15,527 +14,535 @@ class CheckoutScreen extends StatefulWidget {
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
-class _CheckoutScreenState extends State<CheckoutScreen>
-    with TickerProviderStateMixin {
-  String selectedPaymentMethod = 'card';
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOut,
-    ));
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
-    _fadeController.forward();
-    _slideController.forward();
-  }
-
-  @override
-  void dispose() {
-    _fadeController.dispose();
-    _slideController.dispose();
-    super.dispose();
-  }
+class _CheckoutScreenState extends State<CheckoutScreen> {
+  String _selectedPaymentMethod = 'card';
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(MyColors.background),
-      appBar: CustomAppBar(
+      backgroundColor: const Color(MyColors.background),
+      appBar: const CustomAppBar(
         title: 'Checkout',
+        automaticallyImplyLeading: true,
       ),
       body: BlocBuilder<CartCubit, CartState>(
         builder: (context, state) {
           if (state is CartLoaded) {
-            return FadeTransition(
-              opacity: _fadeAnimation,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(5.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Order Summary Section
-                      _buildSectionHeader(
-                        context,
-                        'Order Summary',
-                        Icons.receipt_long_rounded,
-                      ),
-                      SizedBox(height: 2.h),
-                      Container(
-                        padding: EdgeInsets.all(4.w),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(MyColors.textfieldBakground),
-                              Color(MyColors.textfieldBakground)
-                                  .withValues(alpha: 0.8),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                              spreadRadius: 0,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            ...state.items.map((item) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 8.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          item.title,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium
-                                              ?.copyWith(
-                                                  color: Color(
-                                                      MyColors.textColor)),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      Text(
-                                        '\$ ${item.price}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelLarge
-                                            ?.copyWith(
-                                                color:
-                                                    Color(MyColors.textColor)),
-                                      ),
-                                    ],
-                                  ),
-                                )),
-                            Divider(color: Color(MyColors.secondaryGrey)),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Total',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(
-                                          color: Color(MyColors.textColor)),
-                                ),
-                                Text(
-                                  '\$ ${state.items.fold(0.0, (sum, item) => sum + ((item.price) as num)).toStringAsFixed(2)}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge
-                                      ?.copyWith(
-                                          color:
-                                              Color(MyColors.primaryRedLight)),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
+            final double totalAmount = state.items.fold(
+              0.0,
+              (sum, item) => sum + ((item.price) as num),
+            );
 
-                      // Shipping Information Section
-                      _buildSectionHeader(
-                        context,
-                        'Shipping Information',
-                        Icons.local_shipping_rounded,
+            return Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 16.0,
                       ),
-                      SizedBox(height: 2.h),
-                      Container(
-                        padding: EdgeInsets.all(4.w),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(MyColors.textfieldBakground),
-                              Color(MyColors.textfieldBakground)
-                                  .withValues(alpha: 0.8),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                              spreadRadius: 0,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            _buildModernTextField(
-                              labelText: 'Full Name',
-                              prefixIcon: Icons.person_rounded,
-                            ),
-                            SizedBox(height: 2.h),
-                            _buildModernTextField(
-                              labelText: 'Address',
-                              prefixIcon: Icons.location_on_rounded,
-                            ),
-                            SizedBox(height: 2.h),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildModernTextField(
-                                    labelText: 'City',
-                                    prefixIcon: Icons.location_city_rounded,
-                                  ),
-                                ),
-                                SizedBox(width: 3.w),
-                                Expanded(
-                                  child: _buildModernTextField(
-                                    labelText: 'Postal Code',
-                                    prefixIcon:
-                                        Icons.markunread_mailbox_rounded,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Order Summary Section
+                          _buildSectionLabel('ORDER SUMMARY', Icons.receipt_long_rounded),
+                          const SizedBox(height: 10),
+                          _buildOrderSummaryCard(state.items, totalAmount),
 
-                      // Payment Method Section
-                      _buildSectionHeader(
-                        context,
-                        'Payment Method',
-                        Icons.payment_rounded,
-                      ),
-                      SizedBox(height: 2.h),
-                      Container(
-                        padding: EdgeInsets.all(4.w),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(MyColors.textfieldBakground),
-                              Color(MyColors.textfieldBakground)
-                                  .withValues(alpha: 0.8),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                              spreadRadius: 0,
-                            ),
-                          ],
-                        ),
-                        child: RadioGroup<String>(
-                          groupValue: selectedPaymentMethod,
-                          onChanged: (String? value) {
-                            if (value != null) {
-                              setState(() {
-                                selectedPaymentMethod = value;
-                              });
-                            }
-                          },
-                          child: Column(
-                            children: [
-                              ListTile(
-                                leading: Radio<String>(
-                                  value: 'card',
-                                  activeColor: const Color(MyColors.primaryRed),
-                                  fillColor:
-                                      WidgetStateProperty.resolveWith<Color>(
-                                    (Set<WidgetState> states) {
-                                      if (states.contains(WidgetState.selected)) {
-                                        return const Color(MyColors.primaryRed);
-                                      }
-                                      return const Color(MyColors.textSecondary);
-                                    },
-                                  ),
-                                ),
-                                title: const Text('Credit/Debit Card',
-                                    style: TextStyle(
-                                        color: Color(MyColors.textColor))),
-                                trailing: const Icon(Icons.credit_card,
-                                    color: Color(MyColors.textSecondary)),
-                              ),
-                              const Divider(color: Color(MyColors.secondaryGrey)),
-                              ListTile(
-                                leading: Radio<String>(
-                                  value: 'paypal',
-                                  activeColor: const Color(MyColors.primaryRed),
-                                  fillColor:
-                                      WidgetStateProperty.resolveWith<Color>(
-                                    (Set<WidgetState> states) {
-                                      if (states.contains(WidgetState.selected)) {
-                                        return const Color(MyColors.primaryRed);
-                                      }
-                                      return const Color(MyColors.textSecondary);
-                                    },
-                                  ),
-                                ),
-                                title: const Text('PayPal',
-                                    style: TextStyle(
-                                        color: Color(MyColors.textColor))),
-                                trailing: const Icon(Icons.payment,
-                                    color: Color(MyColors.textSecondary)),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
+                          const SizedBox(height: 24),
 
-                      // Place Order Button
-                      Container(
-                        width: double.infinity,
-                        height: 7.h,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Color(MyColors.primaryRed),
-                              Color(MyColors.primaryRedLight),
-                            ],
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color:
-                                  Color(MyColors.primaryRed).withValues(alpha: 0.4),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(25),
-                            onTap: () {
-                              HapticFeedback.mediumImpact();
-                              context.read<CartCubit>().clearCart();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const OrderSuccessScreen(),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.shopping_bag_rounded,
-                                    color: Colors.white,
-                                    size: 22,
-                                  ),
-                                  SizedBox(width: 3.w),
-                                  Text(
-                                    'Place Order',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  SizedBox(width: 2.w),
-                                  Icon(
-                                    Icons.arrow_forward_rounded,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+                          // Shipping Information Section
+                          _buildSectionLabel('SHIPPING DETAILS', Icons.local_shipping_outlined),
+                          const SizedBox(height: 10),
+                          _buildShippingCard(),
+
+                          const SizedBox(height: 24),
+
+                          // Payment Method Section
+                          _buildSectionLabel('PAYMENT METHOD', Icons.payment_rounded),
+                          const SizedBox(height: 10),
+                          _buildPaymentMethodSection(),
+
+                          const SizedBox(height: 32),
+                        ],
                       ),
-                      SizedBox(height: 2.h),
-                    ],
+                    ),
                   ),
-                ),
+
+                  // Bottom Action Bar
+                  _buildBottomBar(totalAmount),
+                ],
               ),
             );
           }
-          return Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Color(MyColors.primaryRed),
+            ),
+          );
         },
       ),
     );
   }
 
-  Widget _buildSectionHeader(
-      BuildContext context, String title, IconData icon) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [
-            Color(MyColors.primaryRed).withValues(alpha: 0.1),
-            Color(MyColors.primaryRedLight).withValues(alpha: 0.05),
-          ],
+  Widget _buildSectionLabel(String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: const Color(MyColors.primaryRed),
         ),
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Color(MyColors.primaryRed).withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: const TextStyle(
+            color: Color(MyColors.textSecondary),
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.1,
           ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOrderSummaryCard(List items, double total) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(MyColors.cardSurface),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(MyColors.borderSubtle),
+          width: 1,
+        ),
       ),
-      child: Row(
+      padding: const EdgeInsets.all(16),
+      child: Column(
         children: [
-          Container(
-            padding: EdgeInsets.all(2.w),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(MyColors.primaryRed),
-                  Color(MyColors.primaryRedLight),
+          ...items.take(3).map((item) => Padding(
+                padding: const EdgeInsets.only(bottom: 10.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(MyColors.textColor),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      '\$${item.price}',
+                      style: const TextStyle(
+                        color: Color(MyColors.textColor),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+          if (items.length > 3) ...[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                children: [
+                  Text(
+                    '+ ${items.length - 3} more item(s)',
+                    style: const TextStyle(
+                      color: Color(MyColors.textTertiary),
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
                 ],
               ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(MyColors.primaryRed).withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
             ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 20,
-            ),
+          ],
+          const Divider(
+            color: Color(MyColors.borderSubtle),
+            height: 20,
+            thickness: 1,
           ),
-          SizedBox(width: 3.w),
-          Text(
-            title,
-            style: TextStyle(
-              color: Color(MyColors.textColor),
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Subtotal',
+                style: TextStyle(
+                  color: Color(MyColors.textSecondary),
+                  fontSize: 13,
+                ),
+              ),
+              Text(
+                '\$${total.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  color: Color(MyColors.textColor),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Shipping',
+                style: TextStyle(
+                  color: Color(MyColors.textSecondary),
+                  fontSize: 13,
+                ),
+              ),
+              Text(
+                'FREE',
+                style: TextStyle(
+                  color: Color(0xFF10B981),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Total Amount',
+                style: TextStyle(
+                  color: Color(MyColors.textColor),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Text(
+                '\$${total.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  color: Color(MyColors.primaryRed),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildModernTextField({
-    required String labelText,
-    required IconData prefixIcon,
-  }) {
+  Widget _buildShippingCard() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+        color: const Color(MyColors.cardSurface),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(MyColors.borderSubtle),
+          width: 1,
+        ),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildField(
+            label: 'Full Name',
+            initialValue: 'John Doe',
+            icon: Icons.person_outline_rounded,
+          ),
+          const SizedBox(height: 12),
+          _buildField(
+            label: 'Delivery Address',
+            initialValue: '742 Evergreen Terrace',
+            icon: Icons.location_on_outlined,
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildField(
+                  label: 'City',
+                  initialValue: 'Springfield',
+                  icon: Icons.location_city_rounded,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildField(
+                  label: 'Postal Code',
+                  initialValue: '97477',
+                  icon: Icons.markunread_mailbox_outlined,
+                ),
+              ),
+            ],
           ),
         ],
       ),
-      child: TextFormField(
-        style: TextStyle(
-          color: Color(MyColors.textColor),
-          fontSize: 14.sp,
+    );
+  }
+
+  Widget _buildField({
+    required String label,
+    required String initialValue,
+    required IconData icon,
+  }) {
+    return TextFormField(
+      initialValue: initialValue,
+      style: const TextStyle(
+        color: Color(MyColors.textColor),
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(
+          color: Color(MyColors.textSecondary),
+          fontSize: 12,
         ),
-        decoration: InputDecoration(
-          labelText: labelText,
-          labelStyle: TextStyle(
-            color: Color(MyColors.textSecondary),
-            fontSize: 12.sp,
+        prefixIcon: Icon(
+          icon,
+          size: 18,
+          color: const Color(MyColors.textSecondary),
+        ),
+        filled: true,
+        fillColor: const Color(MyColors.textfieldBakground),
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(MyColors.borderSubtle)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(MyColors.borderSubtle)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(MyColors.primaryRed), width: 1.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentMethodSection() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildPaymentOption(
+            id: 'card',
+            label: 'Credit Card',
+            icon: Icons.credit_card_rounded,
+            subtitle: '**** 4242',
           ),
-          prefixIcon: Container(
-            margin: EdgeInsets.all(2.w),
-            padding: EdgeInsets.all(2.w),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(MyColors.primaryRed).withValues(alpha: 0.1),
-                  Color(MyColors.primaryRedLight).withValues(alpha: 0.05),
-                ],
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildPaymentOption(
+            id: 'paypal',
+            label: 'PayPal',
+            icon: Icons.account_balance_wallet_outlined,
+            subtitle: 'john@example.com',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentOption({
+    required String id,
+    required String label,
+    required IconData icon,
+    required String subtitle,
+  }) {
+    final isSelected = _selectedPaymentMethod == id;
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        setState(() {
+          _selectedPaymentMethod = id;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(MyColors.primaryRed).withValues(alpha: 0.1)
+              : const Color(MyColors.cardSurface),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected
+                ? const Color(MyColors.primaryRed)
+                : const Color(MyColors.borderSubtle),
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(
+                  icon,
+                  size: 22,
+                  color: isSelected
+                      ? const Color(MyColors.primaryRed)
+                      : const Color(MyColors.textSecondary),
+                ),
+                Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isSelected
+                        ? const Color(MyColors.primaryRed)
+                        : Colors.transparent,
+                    border: Border.all(
+                      color: isSelected
+                          ? const Color(MyColors.primaryRed)
+                          : const Color(MyColors.textTertiary),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: isSelected
+                      ? const Center(
+                          child: Icon(
+                            Icons.check,
+                            size: 10,
+                            color: Colors.white,
+                          ),
+                        )
+                      : null,
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected
+                    ? const Color(MyColors.textColor)
+                    : const Color(MyColors.textSecondary),
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
               ),
-              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              prefixIcon,
-              color: Color(MyColors.primaryRed),
-              size: 18,
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: const TextStyle(
+                color: Color(MyColors.textTertiary),
+                fontSize: 11,
+              ),
             ),
-          ),
-          filled: true,
-          fillColor: Color(MyColors.textfieldBakground),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide(
-              color: Color(MyColors.secondaryGrey).withValues(alpha: 0.3),
-              width: 1,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide(
-              color: Color(MyColors.primaryRed),
-              width: 2,
-            ),
-          ),
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 4.w,
-            vertical: 2.h,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomBar(double totalAmount) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+      decoration: BoxDecoration(
+        color: const Color(MyColors.cardSurface),
+        border: const Border(
+          top: BorderSide(
+            color: Color(MyColors.borderSubtle),
+            width: 1,
           ),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Total Due',
+                  style: TextStyle(
+                    color: Color(MyColors.textTertiary),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '\$${totalAmount.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    color: Color(MyColors.textColor),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: SizedBox(
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () {
+                  HapticFeedback.mediumImpact();
+                  context.read<CartCubit>().clearCart();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OrderSuccessScreen(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(MyColors.primaryRed),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Place Order',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 18,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

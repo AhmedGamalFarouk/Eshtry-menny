@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sizer/sizer.dart';
 
 import '../../../core/constants/mycolors.dart';
 import '../../../core/navigation_cubit.dart';
@@ -18,15 +18,24 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: const Color(MyColors.textfieldBakground),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: const Color(MyColors.cardSurface),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(MyColors.borderSubtle)),
+        ),
         title: const Text(
           'Sign Out',
-          style: TextStyle(color: Color(MyColors.textColor)),
+          style: TextStyle(
+            color: Color(MyColors.textColor),
+            fontWeight: FontWeight.w700,
+          ),
         ),
         content: const Text(
-          'Are you sure you want to sign out?',
-          style: TextStyle(color: Color(MyColors.textSecondary)),
+          'Are you sure you want to sign out of your account?',
+          style: TextStyle(
+            color: Color(MyColors.textSecondary),
+            fontSize: 14,
+          ),
         ),
         actions: [
           TextButton(
@@ -39,9 +48,15 @@ class ProfileScreen extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(MyColors.primaryRed),
-              minimumSize: const Size(80, 36),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             ),
             onPressed: () async {
+              HapticFeedback.mediumImpact();
               Navigator.pop(dialogContext);
               await context.read<AuthCubit>().signOut();
               if (context.mounted) {
@@ -66,41 +81,46 @@ class ProfileScreen extends StatelessWidget {
             return const Center(
               child: CircularProgressIndicator(
                 color: Color(MyColors.primaryRed),
+                strokeWidth: 2.5,
               ),
             );
           } else if (state is ProfileError) {
             return Center(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 6.w),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(
                       Icons.error_outline_rounded,
-                      size: 64,
-                      color: Color(MyColors.error),
+                      size: 56,
+                      color: Color(MyColors.primaryRed),
                     ),
-                    SizedBox(height: 2.h),
+                    const SizedBox(height: 16),
                     Text(
                       state.message,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Color(MyColors.textSecondary),
-                        fontSize: 15,
+                        fontSize: 14,
                       ),
                     ),
-                    SizedBox(height: 3.h),
+                    const SizedBox(height: 24),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(MyColors.primaryRed),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
                         ),
                       ),
                       onPressed: () =>
                           context.read<ProfileCubit>().loadProfile(),
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('Try Again'),
+                      icon: const Icon(Icons.refresh, size: 18),
+                      label: const Text('Retry'),
                     ),
                   ],
                 ),
@@ -112,29 +132,38 @@ class ProfileScreen extends StatelessWidget {
 
             return RefreshIndicator(
               color: const Color(MyColors.primaryRed),
-              backgroundColor: const Color(MyColors.textfieldBakground),
+              backgroundColor: const Color(MyColors.cardSurface),
               onRefresh: () => context.read<ProfileCubit>().refresh(),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // User Header Card
+                    // Member Header Card
                     _buildUserHeader(context, profile),
-                    SizedBox(height: 2.5.h),
+                    const SizedBox(height: 24),
 
                     // Shipping Address Card
+                    _buildSectionHeader('SHIPPING ADDRESS', Icons.location_on_outlined),
+                    const SizedBox(height: 10),
                     _buildAddressCard(context, profile.address),
-                    SizedBox(height: 2.5.h),
+                    const SizedBox(height: 24),
 
                     // Order History Section
+                    _buildSectionHeader(
+                      'ORDER HISTORY',
+                      Icons.history_rounded,
+                      badge: '${orders.length}',
+                    ),
+                    const SizedBox(height: 10),
                     _buildOrdersSection(context, orders),
-                    SizedBox(height: 2.5.h),
+                    const SizedBox(height: 24),
 
-                    // Account Actions & Sign Out
+                    // Account Settings & Actions
+                    _buildSectionHeader('ACCOUNT & PREFERENCES', Icons.tune_rounded),
+                    const SizedBox(height: 10),
                     _buildAccountActions(context),
-                    SizedBox(height: 4.h),
                   ],
                 ),
               ),
@@ -146,106 +175,160 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildSectionHeader(String title, IconData icon, {String? badge}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: const Color(MyColors.primaryRed),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Color(MyColors.textSecondary),
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.1,
+              ),
+            ),
+          ],
+        ),
+        if (badge != null)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: const Color(MyColors.primaryRed).withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              badge,
+              style: const TextStyle(
+                color: Color(MyColors.primaryRed),
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget _buildUserHeader(BuildContext context, UserProfileModel profile) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(4.w),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(MyColors.textfieldBakground),
+        color: const Color(MyColors.cardSurface),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(MyColors.borderSubtle),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 16,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 36,
-            backgroundColor: const Color(MyColors.primaryRed),
-            child: Text(
-              profile.initials,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22.sp,
-                fontWeight: FontWeight.bold,
+          // Squircle avatar
+          Container(
+            width: 68,
+            height: 68,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(MyColors.primaryRed),
+                  Color(MyColors.primaryRedLight),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(MyColors.primaryRed).withValues(alpha: 0.3),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                profile.initials,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
           ),
-          SizedBox(width: 4.w),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  profile.fullName.isNotEmpty ? profile.fullName : profile.username,
-                  style: TextStyle(
-                    color: const Color(MyColors.textColor),
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 0.5.h),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: const Color(MyColors.primaryRed).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '@${profile.username}',
-                    style: const TextStyle(
-                      color: Color(MyColors.primaryRed),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        profile.fullName.isNotEmpty ? profile.fullName : profile.username,
+                        style: const TextStyle(
+                          color: Color(MyColors.textColor),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
+                    const SizedBox(width: 6),
+                    const Icon(
+                      Icons.verified_rounded,
+                      color: Color(0xFF10B981),
+                      size: 16,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '@${profile.username}',
+                  style: const TextStyle(
+                    color: Color(MyColors.primaryRed),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: 0.8.h),
+                const SizedBox(height: 6),
                 Row(
                   children: [
                     const Icon(
                       Icons.email_outlined,
-                      size: 14,
-                      color: Color(MyColors.textSecondary),
+                      size: 13,
+                      color: Color(MyColors.textTertiary),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         profile.email,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Color(MyColors.textSecondary),
-                          fontSize: 13,
+                          fontSize: 12,
                         ),
                       ),
                     ),
                   ],
                 ),
-                if (profile.phone.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.phone_outlined,
-                        size: 14,
-                        color: Color(MyColors.textSecondary),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        profile.phone,
-                        style: const TextStyle(
-                          color: Color(MyColors.textSecondary),
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ],
             ),
           ),
@@ -257,55 +340,55 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildAddressCard(BuildContext context, UserAddress address) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(4.w),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(MyColors.textfieldBakground),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: const Color(MyColors.cardSurface),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(MyColors.borderSubtle),
+          width: 1,
+        ),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(MyColors.primaryRed).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.location_on_outlined,
-                  color: Color(MyColors.primaryRed),
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Default Shipping Address',
-                style: TextStyle(
-                  color: const Color(MyColors.textColor),
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(MyColors.primaryRed).withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              Icons.home_outlined,
+              color: Color(MyColors.primaryRed),
+              size: 18,
+            ),
           ),
-          SizedBox(height: 1.5.h),
-          Text(
-            address.formattedAddress.isNotEmpty
-                ? address.formattedAddress
-                : 'No delivery address specified.',
-            style: TextStyle(
-              color: const Color(MyColors.textSecondary),
-              fontSize: 14.sp,
-              height: 1.4,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Primary Shipping Location',
+                  style: TextStyle(
+                    color: Color(MyColors.textColor),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  address.formattedAddress.isNotEmpty
+                      ? address.formattedAddress
+                      : 'No delivery address specified.',
+                  style: const TextStyle(
+                    color: Color(MyColors.textSecondary),
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -314,184 +397,200 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildOrdersSection(BuildContext context, List<UserOrderModel> orders) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Past Orders',
-              style: TextStyle(
-                color: const Color(MyColors.textColor),
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(MyColors.primaryRed).withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '${orders.length} Orders',
-                style: const TextStyle(
-                  color: Color(MyColors.primaryRed),
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 1.5.h),
-        if (orders.isEmpty)
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(4.w),
-            decoration: BoxDecoration(
-              color: const Color(MyColors.textfieldBakground),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Center(
-              child: Text(
-                'No past orders yet.',
-                style: TextStyle(color: Color(MyColors.textSecondary)),
-              ),
-            ),
-          )
-        else
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: orders.length,
-            separatorBuilder: (_, __) => SizedBox(height: 1.h),
-            itemBuilder: (context, index) {
-              final order = orders[index];
-              return Container(
-                padding: EdgeInsets.all(3.5.w),
-                decoration: BoxDecoration(
-                  color: const Color(MyColors.textfieldBakground),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.green.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.check_circle_outline_rounded,
-                        color: Colors.green,
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Order #ORD-${order.id}',
-                            style: const TextStyle(
-                              color: Color(MyColors.textColor),
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Date: ${order.formattedDate} • ${order.totalItemCount} Items',
-                            style: const TextStyle(
-                              color: Color(MyColors.textSecondary),
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.green.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        'Completed',
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
+    if (orders.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(MyColors.cardSurface),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: const Color(MyColors.borderSubtle),
           ),
-      ],
+        ),
+        child: const Center(
+          child: Text(
+            'No past orders yet.',
+            style: TextStyle(
+              color: Color(MyColors.textSecondary),
+              fontSize: 13,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: orders.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (context, index) {
+        final order = orders[index];
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(MyColors.cardSurface),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(MyColors.borderSubtle),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.check_circle_outline_rounded,
+                  color: Color(0xFF10B981),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Order #ESH-${order.id.toString().padLeft(4, '0')}',
+                      style: const TextStyle(
+                        color: Color(MyColors.textColor),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${order.formattedDate} • ${order.totalItemCount} item${order.totalItemCount > 1 ? 's' : ''}',
+                      style: const TextStyle(
+                        color: Color(MyColors.textSecondary),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'Delivered',
+                  style: TextStyle(
+                    color: Color(0xFF10B981),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
   Widget _buildAccountActions(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(MyColors.textfieldBakground),
-        borderRadius: BorderRadius.circular(20),
+        color: const Color(MyColors.cardSurface),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: const Color(MyColors.borderSubtle),
+          width: 1,
+        ),
       ),
       child: Column(
         children: [
-          ListTile(
-            leading: const Icon(
-              Icons.privacy_tip_outlined,
-              color: Color(MyColors.textSecondary),
-            ),
-            title: const Text(
-              'Privacy & Terms',
-              style: TextStyle(color: Color(MyColors.textColor)),
-            ),
-            trailing: const Icon(
-              Icons.chevron_right,
-              color: Color(MyColors.textSecondary),
-            ),
+          _buildActionTile(
+            icon: Icons.shield_outlined,
+            title: 'Privacy Policy & Terms',
             onTap: () {},
           ),
           const Divider(
             height: 1,
-            color: Color(MyColors.background),
+            color: Color(MyColors.borderSubtle),
           ),
-          ListTile(
-            leading: const Icon(
-              Icons.logout_rounded,
-              color: Color(MyColors.primaryRed),
-            ),
-            title: const Text(
-              'Sign Out',
-              style: TextStyle(
-                color: Color(MyColors.primaryRed),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            trailing: const Icon(
-              Icons.chevron_right,
-              color: Color(MyColors.primaryRed),
-            ),
+          _buildActionTile(
+            icon: Icons.support_agent_rounded,
+            title: 'Customer Support',
+            onTap: () {},
+          ),
+          const Divider(
+            height: 1,
+            color: Color(MyColors.borderSubtle),
+          ),
+          _buildActionTile(
+            icon: Icons.logout_rounded,
+            title: 'Sign Out',
+            isDestructive: true,
             onTap: () => _showSignOutDialog(context),
           ),
         ],
       ),
     );
   }
+
+  Widget _buildActionTile({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    final color = isDestructive
+        ? const Color(MyColors.primaryRed)
+        : const Color(MyColors.textColor);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: isDestructive
+                    ? const Color(MyColors.primaryRed)
+                    : const Color(MyColors.textSecondary),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 14,
+                    fontWeight: isDestructive ? FontWeight.w600 : FontWeight.w500,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: isDestructive
+                    ? const Color(MyColors.primaryRed).withValues(alpha: 0.6)
+                    : const Color(MyColors.textTertiary),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
+

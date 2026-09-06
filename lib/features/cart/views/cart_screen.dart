@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sizer/sizer.dart';
 
 import '../../../core/constants/mycolors.dart';
 import '../../../core/widgets/custom_app_bar.dart';
@@ -100,10 +99,11 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
     return Column(
       children: [
         Expanded(
-          child: ListView.builder(
-            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             physics: const BouncingScrollPhysics(),
             itemCount: state.items.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               return _buildCartItem(state.items[index], index);
             },
@@ -125,183 +125,108 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
           context.read<CartCubit>().removeFromCart(item.id);
         },
         background: Container(
-          margin: EdgeInsets.only(bottom: 2.h),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                Colors.red.shade400,
-                Colors.red.shade600,
-              ],
-            ),
-          ),
           alignment: Alignment.centerRight,
-          padding: EdgeInsets.symmetric(horizontal: 6.w),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          padding: const EdgeInsets.only(right: 20),
+          decoration: BoxDecoration(
+            color: const Color(MyColors.error).withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.delete_rounded,
-                color: Colors.white,
-                size: 28,
-              ),
-              SizedBox(height: 0.5.h),
+              Icon(Icons.delete_outline_rounded, color: Colors.white, size: 22),
+              SizedBox(width: 6),
               Text(
-                'Delete',
+                'Remove',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 12.sp,
                   fontWeight: FontWeight.w600,
+                  fontSize: 13,
                 ),
               ),
             ],
           ),
         ),
         child: Container(
-          margin: EdgeInsets.only(bottom: 2.h),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                const Color(MyColors.textfieldBakground),
-                const Color(MyColors.textfieldBakground).withValues(alpha: 0.8),
-              ],
+            color: const Color(MyColors.cardBackground),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(MyColors.borderSubtle),
+              width: 1,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 15,
-                offset: const Offset(0, 8),
-                spreadRadius: 0,
-              ),
-            ],
           ),
-          child: Padding(
-            padding: EdgeInsets.all(2.h),
-            child: Row(
-              children: [
-                Hero(
-                  tag: 'cart_item_${item.id}',
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
+          child: Row(
+            children: [
+              // Product Image Squircle
+              Hero(
+                tag: 'cart_item_${item.id}',
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: CachedNetworkImage(
+                    imageUrl: item.image,
+                    fit: BoxFit.contain,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(MyColors.primaryRed),
+                        strokeWidth: 2,
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => const Center(
+                      child: Icon(
+                        Icons.image_not_supported_outlined,
+                        color: Colors.grey,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              // Title, Unit Price & Stepper
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(MyColors.textColor),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13.5,
+                        height: 1.25,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          '\$${item.price.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            color: Color(MyColors.primaryRed),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.3,
+                          ),
                         ),
+                        _buildQuantityControls(item),
                       ],
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        width: 28.w,
-                        height: 28.w,
-                        color: Colors.white,
-                        child: CachedNetworkImage(
-                          imageUrl: item.image,
-                          fit: BoxFit.contain,
-                          placeholder: (context, url) => Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                color: Color(MyColors.primaryRed),
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Icon(
-                              Icons.image_not_supported,
-                              color: Colors.grey.shade400,
-                              size: 10.w,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
-                SizedBox(width: 4.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.title,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: const Color(MyColors.textColor),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15.sp,
-                            ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 1.5.h),
-                      Row(
-                        children: [
-                          Text(
-                            '\$${item.price.toStringAsFixed(2)}',
-                            style: TextStyle(
-                              color: const Color(MyColors.textSecondary),
-                              fontSize: 12.sp,
-                              decoration: TextDecoration.lineThrough,
-                            ),
-                          ),
-                          SizedBox(width: 2.w),
-                          Text(
-                            '\$${(item.price * 0.9).toStringAsFixed(2)}',
-                            style: TextStyle(
-                              color: const Color(MyColors.textSecondary),
-                              fontSize: 12.sp,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 2.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildQuantityControls(item),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                'Total',
-                                style: TextStyle(
-                                  color: const Color(MyColors.textSecondary),
-                                  fontSize: 10.sp,
-                                ),
-                              ),
-                              Text(
-                                '\$${(item.price * item.quantity).toStringAsFixed(2)}',
-                                style: TextStyle(
-                                  color: const Color(MyColors.primaryRed),
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -311,41 +236,49 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
   Widget _buildQuantityControls(item) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
-        color: const Color(MyColors.background),
-        border: Border.all(
-          color: const Color(MyColors.primaryRed).withValues(alpha: 0.2),
-          width: 1,
-        ),
+        color: const Color(MyColors.textfieldBakground),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(MyColors.borderSubtle)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildQuantityButton(
-            icon: Icons.remove_rounded,
+            icon: item.quantity > 1
+                ? Icons.remove_rounded
+                : Icons.delete_outline_rounded,
             onPressed: item.quantity > 1
-                ? () => context
-                    .read<CartCubit>()
-                    .updateQuantity(item.id, item.quantity - 1)
-                : null,
-            isEnabled: item.quantity > 1,
+                ? () {
+                    HapticFeedback.lightImpact();
+                    context
+                        .read<CartCubit>()
+                        .updateQuantity(item.id, item.quantity - 1);
+                  }
+                : () {
+                    HapticFeedback.mediumImpact();
+                    context.read<CartCubit>().removeFromCart(item.id);
+                  },
+            isEnabled: true,
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.2.h),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Text(
               '${item.quantity}',
-              style: TextStyle(
-                color: const Color(MyColors.primaryRed),
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
+              style: const TextStyle(
+                color: Color(MyColors.textColor),
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
           _buildQuantityButton(
             icon: Icons.add_rounded,
-            onPressed: () => context
-                .read<CartCubit>()
-                .updateQuantity(item.id, item.quantity + 1),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              context
+                  .read<CartCubit>()
+                  .updateQuantity(item.id, item.quantity + 1);
+            },
             isEnabled: true,
           ),
         ],
@@ -358,38 +291,23 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
     required VoidCallback? onPressed,
     required bool isEnabled,
   }) {
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        color: isEnabled
-            ? const Color(MyColors.primaryRed)
-            : const Color(MyColors.textSecondary).withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: isEnabled
-            ? [
-                BoxShadow(
-                  color: const Color(MyColors.primaryRed).withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ]
-            : null,
-      ),
-      child: IconButton(
-        icon: Icon(
-          icon,
-          color: isEnabled ? Colors.white : Colors.grey.shade400,
-          size: 18,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: isEnabled ? onPressed : null,
+        child: Container(
+          width: 28,
+          height: 28,
+          alignment: Alignment.center,
+          child: Icon(
+            icon,
+            color: isEnabled
+                ? const Color(MyColors.textColor)
+                : const Color(MyColors.secondaryGrey),
+            size: 15,
+          ),
         ),
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(),
-        onPressed: isEnabled
-            ? () {
-                HapticFeedback.lightImpact();
-                onPressed?.call();
-              }
-            : null,
       ),
     );
   }
@@ -403,201 +321,145 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
     final savings = originalPrice - discountedPrice;
 
     return Container(
-      padding: EdgeInsets.all(6.w),
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+      decoration: const BoxDecoration(
+        color: Color(MyColors.surface),
+        border: Border(
+          top: BorderSide(color: Color(MyColors.borderSubtle), width: 1),
         ),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            const Color(MyColors.textfieldBakground),
-            const Color(MyColors.textfieldBakground).withValues(alpha: 0.95),
-          ],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 25,
-            offset: const Offset(0, -10),
-            spreadRadius: 0,
-          ),
-        ],
       ),
       child: SafeArea(
         top: false,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Order summary header
+            // Subtotal
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Order Summary',
-                  style: TextStyle(
-                    color: const Color(MyColors.textColor),
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.5.h),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: const Color(MyColors.primaryRed).withValues(alpha: 0.1),
-                  ),
-                  child: Text(
-                    '$totalItems items',
-                    style: TextStyle(
-                      color: const Color(MyColors.primaryRed),
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 2.h),
-            // Price breakdown
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Subtotal',
-                  style: TextStyle(
-                    color: const Color(MyColors.textSecondary),
-                    fontSize: 14.sp,
+                  'Subtotal ($totalItems items)',
+                  style: const TextStyle(
+                    color: Color(MyColors.textSecondary),
+                    fontSize: 13,
                   ),
                 ),
                 Text(
                   '\$${originalPrice.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    color: const Color(MyColors.textColor),
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
+                  style: const TextStyle(
+                    color: Color(MyColors.textColor),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 1.h),
+            const SizedBox(height: 6),
+            // Discount
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Discount (10%)',
-                  style: TextStyle(
-                    color: const Color(MyColors.success),
-                    fontSize: 14.sp,
-                  ),
+                Row(
+                  children: [
+                    const Text(
+                      'Store Discount',
+                      style: TextStyle(
+                        color: Color(MyColors.textSecondary),
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(MyColors.success)
+                            .withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        '10% OFF',
+                        style: TextStyle(
+                          color: Color(MyColors.success),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 Text(
                   '-\$${savings.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    color: const Color(MyColors.success),
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
+                  style: const TextStyle(
+                    color: Color(MyColors.success),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 1.h),
-            Divider(
-              color: const Color(MyColors.textSecondary).withValues(alpha: 0.3),
-              thickness: 1,
-            ),
-            SizedBox(height: 1.h),
+            const SizedBox(height: 10),
+            const Divider(color: Color(MyColors.borderSubtle)),
+            const SizedBox(height: 10),
+            // Total
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Total Amount',
                   style: TextStyle(
-                    color: const Color(MyColors.textColor),
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
+                    color: Color(MyColors.textColor),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
                   ),
                 ),
                 Text(
                   '\$${discountedPrice.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    color: const Color(MyColors.primaryRed),
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
+                  style: const TextStyle(
+                    color: Color(MyColors.primaryRed),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.4,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 3.h),
+            const SizedBox(height: 14),
             // Checkout button
-            ScaleTransition(
-              scale: _scaleAnimation,
-              child: Container(
-                width: double.infinity,
-                height: 7.h,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(25),
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      const Color(MyColors.primaryRed),
-                      const Color(MyColors.primaryRedLight),
-                    ],
+            ElevatedButton(
+              onPressed: () {
+                HapticFeedback.mediumImpact();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CheckoutScreen(),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(MyColors.primaryRed).withValues(alpha: 0.4),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: ElevatedButton(
-                  onPressed: () {
-                    HapticFeedback.mediumImpact();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CheckoutScreen(),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.shopping_bag_outlined, size: 18),
+                  SizedBox(width: 8),
+                  Text(
+                    'Proceed to Checkout',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.shopping_bag_rounded,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                      SizedBox(width: 3.w),
-                      Text(
-                        'Proceed to Checkout',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(width: 2.w),
-                      Icon(
-                        Icons.arrow_forward_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                ),
+                  SizedBox(width: 4),
+                  Icon(Icons.arrow_forward_rounded, size: 16),
+                ],
               ),
             ),
           ],
